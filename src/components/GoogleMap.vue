@@ -1,5 +1,14 @@
 <template lang="pug">
-div(ref='map', style='width: 100vw; height: 100vh')
+div(style='position: relative')
+  div(ref='map', style='width: 100vw; height: 100vh; z-index: 0')
+  q-toggle(
+    @click='toggleHeatmap()',
+    v-model='toggle',
+    icon='warning',
+    size='5em',
+    color='red',
+    style='position: absolute; left: 5px; top: 5px; z-index: 1'
+  )
 </template> 
 
 <script>
@@ -11,8 +20,12 @@ export default {
 
   data() {
     return {
+      toggle: false,
       center: null,
-      places: []
+      map: null,
+      heatmap: null,
+      places: [],
+      crimes: []
     }
   },
 
@@ -47,7 +60,18 @@ export default {
         .get(URL)
         .then(response => {
           this.places = response.data.results
-          console.log(this.places)
+        })
+        .catch(error => {
+          console.log(error.message)
+        })
+    },
+
+    async getCrimeData() {
+      const URL = `https://data.police.uk/api/crimes-street/all-crime?lat=${this.center.lat}&lng=${this.center.lng}`
+      await axios
+        .get(URL)
+        .then(response => {
+          this.crimes = response.data
         })
         .catch(error => {
           console.log(error.message)
@@ -55,14 +79,14 @@ export default {
     },
 
     async initMap() {
+      var heatmapData = []
+      var infoWindow = new google.maps.InfoWindow()
       var map = new google.maps.Map(this.$refs['map'], {
         center: new google.maps.LatLng(this.center.lat, this.center.lng),
         zoom: 15,
         styles: this.mapStyles,
         disableDefaultUI: true
       })
-
-      var infoWindow = new google.maps.InfoWindow()
 
       this.places.forEach(place => {
         const lat = place.geometry.location.lat
@@ -83,6 +107,26 @@ export default {
           infoWindow.open(map, marker)
         })
       })
+
+      this.crimes.forEach(crime => {
+        const lat = crime.location.latitude
+        const lng = crime.location.longitude
+
+        heatmapData.push(new google.maps.LatLng(lat, lng))
+      })
+
+      var heatmap = new google.maps.visualization.HeatmapLayer({
+        data: heatmapData
+      })
+      heatmap.set('radius', heatmap.get('radius') ? null : 80)
+      heatmap.set('opacity', heatmap.get('opacity') ? null : 0.3)
+
+      this.heatmap = heatmap
+      this.map = map
+    },
+
+    toggleHeatmap() {
+      this.heatmap.setMap(this.heatmap.getMap() ? null : this.map)
     },
 
     isPlaceOpen(place) {
@@ -112,7 +156,6 @@ export default {
       if (place.types[0] == 'bar') {
         icon = 'https://img.icons8.com/color/40/000000/beer.png'
       }
-
       return icon
     }
   },
@@ -124,6 +167,7 @@ export default {
   async mounted() {
     await this.geolocate()
     await this.findPlaces()
+    await this.getCrimeData()
     await this.initMap()
   }
 }
