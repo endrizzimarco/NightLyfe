@@ -3,6 +3,7 @@ div(style='position: relative')
   div(ref='map', style='width: 100vw; height: 100vh; z-index: 0')
   q-toggle(
     @click='toggleHeatmap()',
+    v-if='heatmap',
     v-model='toggle',
     icon='warning',
     size='5em',
@@ -30,11 +31,21 @@ export default {
   },
 
   methods: {
+    // Helper method to turn heatmap on/off
+    toggleHeatmap() {
+      this.heatmap.setMap(this.heatmap.getMap() ? null : this.map)
+    },
+
+    /*********************
+      APIs IMPLEMENTATION
+    **********************/
+    // Fetch current position using MDN Geolocation API
     getCurrentPosition(options = {}) {
       return new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, options)
       })
     },
+    // Set center variable to current estimated coordinates
     async geolocate() {
       if (navigator.geolocation) {
         try {
@@ -50,7 +61,7 @@ export default {
         alert('Geolocation is not supported by this browser.')
       }
     },
-
+    // Set center variable to current estimated coordinates
     async findPlaces() {
       const URL = `https://secret-ocean-49799.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${this.center.lat},${this.center.lng}
                     &radius=1500
@@ -65,22 +76,54 @@ export default {
           console.log(error.message)
         })
     },
-
-    async getCrimeData() {
-      const URL = `https://data.police.uk/api/crimes-street/all-crime?lat=${this.center.lat}&lng=${this.center.lng}`
+    // Return an array containing the dates of last 3 months since the uk.police API was updated
+    async fetchDates() {
+      var datesArray = []
+      const lastUpdateURL = `https://data.police.uk/api/crime-last-updated`
       await axios
-        .get(URL)
+        .get(lastUpdateURL)
         .then(response => {
-          this.crimes = response.data
+          let lastUpdate = response.data.date.split('-')
+          let month = lastUpdate[1]
+          let year = lastUpdate[0]
+
+          for (let i = 0; i < 3; i++) {
+            datesArray.push(year + '-' + month)
+            if (month <= 1) {
+              month = 12
+              year -= 1
+            } else {
+              month -= 1
+            }
+          }
         })
         .catch(error => {
           console.log(error.message)
         })
+      return datesArray
     },
+    // Load crime data of past 3 months into crimes variable
+    async getCrimeData() {
+      let dates = await this.fetchDates()
 
+      for (const date of dates) {
+        const URL = `https://data.police.uk/api/crimes-street/all-crime?lat=${this.center.lat}&lng=${this.center.lng}&date=${date}`
+        await axios
+          .get(URL)
+          .then(response => {
+            let crimeData = response.data
+            this.crimes = this.crimes.concat(crimeData)
+          })
+          .catch(error => {
+            console.log(error.message)
+          })
+      }
+    },
+    // Initialize stylized map, nightlife places markers and crime heatmap
     async initMap() {
       var heatmapData = []
       var infoWindow = new google.maps.InfoWindow()
+      // Initialize the map instance, load the styles from the vuex store
       var map = new google.maps.Map(this.$refs['map'], {
         center: new google.maps.LatLng(this.center.lat, this.center.lng),
         zoom: 15,
@@ -88,6 +131,8 @@ export default {
         disableDefaultUI: true
       })
 
+      // Add marker for every nightlife establishment along with an info window
+      await this.findPlaces()
       this.places.forEach(place => {
         const lat = place.geometry.location.lat
         const lng = place.geometry.location.lng
@@ -108,6 +153,8 @@ export default {
         })
       })
 
+      // Create a heatmap based on crimes location
+      await this.getCrimeData()
       this.crimes.forEach(crime => {
         const lat = crime.location.latitude
         const lng = crime.location.longitude
@@ -121,25 +168,26 @@ export default {
       heatmap.set('radius', heatmap.get('radius') ? null : 80)
       heatmap.set('opacity', heatmap.get('opacity') ? null : 0.3)
 
+      // Save heatmap and map instance for use in toggleHeatmap()
       this.heatmap = heatmap
       this.map = map
     },
 
-    toggleHeatmap() {
-      this.heatmap.setMap(this.heatmap.getMap() ? null : this.map)
-    },
-
+    /*********************
+      GET PLACE'S DETAILS
+    **********************/
+    // Return html element, either Open or closed
     isPlaceOpen(place) {
       if (place.opening_hours) {
         let htmlElement = `<p class="text-negative">Closed</p>`
         if (place.opening_hours.open_now) {
-          htmlElement = `<p class="text-positive ">Open</p>`
+          htmlElement = `<p class="text-positive">Open</p>`
         }
         return htmlElement
       }
       return ''
     },
-
+    // Return hmtl img element of first picture listed for establishment, if any
     getPlaceImage(place) {
       if (place.photos) {
         const URL =
@@ -149,12 +197,14 @@ export default {
       }
       return ''
     },
-
+    // Return specific icon based on first element of 'types' attribute for an establishment
     getPlaceIcon(place) {
       let icon = 'https://img.icons8.com/color/40/000000/disco-ball.png'
 
       if (place.types[0] == 'bar') {
         icon = 'https://img.icons8.com/color/40/000000/beer.png'
+      } else if (place.types[0] == 'restaurant') {
+        icon = 'https://img.icons8.com/color/40/000000/food-and-wine.png'
       }
       return icon
     }
@@ -166,8 +216,6 @@ export default {
 
   async mounted() {
     await this.geolocate()
-    await this.findPlaces()
-    await this.getCrimeData()
     await this.initMap()
   }
 }
