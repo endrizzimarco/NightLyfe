@@ -1,15 +1,14 @@
 <template lang="pug">
-div(style='position: relative')
-  div(ref='map', style='width: 100vw; height: 100vh; z-index: 0')
-  q-toggle(
-    @click='toggleHeatmap()',
-    v-if='heatmap',
-    v-model='toggle',
-    icon='warning',
-    size='5em',
-    color='red',
-    style='position: absolute; left: 5px; top: 5px; z-index: 1'
-  )
+div(ref='map', style='min-height: inherit; z-index: 0')
+q-toggle(
+  @click='toggleHeatmap()',
+  v-if='heatmap',
+  v-model='toggle',
+  icon='warning',
+  size='5em',
+  color='red',
+  style='position: absolute; left: 5px; top: 5px; z-index: 1'
+)
 </template> 
 
 <script>
@@ -61,7 +60,7 @@ export default {
         alert('Geolocation is not supported by this browser.')
       }
     },
-    // Set center variable to current estimated coordinates
+    // Finds 20 places related to keyword 'nightlife' in 1500m proximity of center coordinates
     async findPlaces() {
       const URL = `https://secret-ocean-49799.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${this.center.lat},${this.center.lng}
                     &radius=1500

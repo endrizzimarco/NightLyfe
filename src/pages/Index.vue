@@ -1,5 +1,5 @@
 <template lang="pug">
-q-page.flex.flex-center
+q-page
   GoogleMap
 </template> 
 
