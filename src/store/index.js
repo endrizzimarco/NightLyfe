@@ -15,6 +15,50 @@ import { createStore } from 'vuex'
 export default store(function (/* { ssrContext } */) {
   const Store = createStore({
     state: {
+      menuList: [
+        {
+          icon: 'inbox',
+          label: 'Inbox',
+          color: 'black',
+          separator: true
+        },
+        {
+          icon: 'send',
+          label: 'Outbox',
+          color: 'blue',
+          separator: false
+        },
+        {
+          icon: 'delete',
+          label: 'Trash',
+          color: 'black',
+          separator: false
+        },
+        {
+          icon: 'error',
+          label: 'Spam',
+          color: 'red',
+          separator: true
+        },
+        {
+          icon: 'settings',
+          label: 'Settings',
+          color: 'gray',
+          separator: false
+        },
+        {
+          icon: 'feedback',
+          label: 'Send Feedback',
+          color: 'orange',
+          separator: false
+        },
+        {
+          icon: 'help',
+          label: 'Help',
+          color: 'green',
+          separator: false
+        }
+      ],
       mapStyles: [
         {
           featureType: 'water',
