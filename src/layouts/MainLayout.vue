@@ -1,96 +1,51 @@
-<template>
-  <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
-        <q-btn flat dense round icon="menu" aria-label="Menu" @click="toggleLeftDrawer" />
-
-        <q-toolbar-title> Quasar App </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
-      </q-toolbar>
-    </q-header>
-
-    <q-drawer v-model="leftDrawerOpen" show-if-above bordered class="bg-grey-1">
-      <q-list>
-        <q-item-label header class="text-grey-8"> Essential Links </q-item-label>
-
-        <EssentialLink v-for="link in essentialLinks" :key="link.title" v-bind="link" />
-      </q-list>
-    </q-drawer>
-
-    <q-page-container>
-      <router-view />
-    </q-page-container>
-  </q-layout>
+<template lang="pug">
+q-layout(view='lHh Lpr lFf')
+  q-drawer.bg-white(v-model='leftDrawer', show-if-above, bordered, :width='200')
+    q-scroll-area(style='height: calc(100% - 150px); margin-top: 150px; border-right: 1px solid #ddd')
+      q-list.padding
+        template(v-for='(menuItem, index) in menuList', :key='index')
+          q-item(clickable, :active='menuItem.label === "Outbox"', v-ripple)
+            q-item-section(avatar)
+              q-icon(:name='menuItem.icon', :color='menuItem.color')
+            q-item-section
+              | {{ menuItem.label }}
+          q-separator(:key='"sep" + index', v-if='menuItem.separator')
+    q-img.absolute-top(src='https://cdn.quasar.dev/img/material.png', style='height: 150px')
+      .absolute-bottom.bg-transparent
+        q-avatar.q-mb-sm(size='56px')
+          img(src='https://cdn.quasar.dev/img/boy-avatar.png')
+        .text-weight-bold Razvan Stoenescu
+        div @rstoenescu
+  q-drawer.bg-white(v-model='rightDrawer', side='right', show-if-above, bordered)
+    Friends
+  q-page-container
+    router-view
+    q-page-sticky(position='top-left', :offset='[18, 18]')
+      q-btn(@click='leftDrawer = !leftDrawer', round, outline, color='cyan-1', icon='more_horiz')
+    q-page-sticky(position='bottom-right', :offset='[18, 36]')
+      q-btn(@click='rightDrawer = !rightDrawer', fab, color='primary', icon='chat')
 </template>
 
 <script>
-import EssentialLink from 'components/EssentialLink.vue'
+import Friends from 'components/Friends.vue'
+import { mapState } from 'vuex'
 
-const linksList = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
-  }
-]
-
-import { defineComponent, ref } from 'vue'
-
-export default defineComponent({
+export default {
   name: 'MainLayout',
 
   components: {
-    EssentialLink
+    Friends
   },
 
-  setup() {
-    const leftDrawerOpen = ref(false)
-
+  data() {
     return {
-      essentialLinks: linksList,
-      leftDrawerOpen,
-      toggleLeftDrawer() {
-        leftDrawerOpen.value = !leftDrawerOpen.value
-      }
+      leftDrawer: false,
+      rightDrawer: false
     }
+  },
+
+  computed: {
+    ...mapState(['menuList'])
   }
-})
+}
 </script>
