@@ -1,25 +1,34 @@
 <template lang="pug">
 q-layout(view='lHh Lpr lFf')
-  q-drawer.bg-white(v-model='leftDrawer', show-if-above, bordered, :width='200')
-    q-scroll-area(style='height: calc(100% - 150px); margin-top: 150px; border-right: 1px solid #ddd')
+  //- Left Drawer 
+  q-drawer.bg-white(v-model='leftDrawer', show-if-above, :width='200')
+    q-scroll-area(style='height: calc(100% - 150px); margin-top: 150px')
       q-list.padding
         template(v-for='(menuItem, index) in menuList', :key='index')
-          q-item(clickable, v-ripple)
+          q-item(clickable, v-ripple, :to='menuItem.link')
             q-item-section(avatar)
               q-icon(:name='menuItem.icon', :color='menuItem.color')
             q-item-section
               | {{ menuItem.label }}
           q-separator(:key='"sep" + index', v-if='menuItem.separator')
-    q-img.absolute-top(src='https://cdn.quasar.dev/img/material.png', style='height: 150px')
-      .absolute-bottom.bg-transparent
-        q-avatar.q-mb-sm(size='56px')
-          img(src='https://cdn.quasar.dev/img/boy-avatar.png')
+    q-img.absolute-top(
+      src='https://i.pinimg.com/564x/a8/1e/01/a81e01701e045f8f70c71dd324c5a87a.jpg',
+      style='height: 150px'
+    )
+      .row.absolute-bottom.bg-transparent.justify-center
+        q-avatar(size='7em')
+          img(
+            src='https://avataaars.io/?avatarStyle=Circle&topType=Eyepatch&facialHairType=Blank&clotheType=ShirtVNeck&clotheColor=Pink&eyeType=Squint&eyebrowType=AngryNatural&mouthType=Default&skinColor=Light'
+          )
         .text-weight-bold Razvan Stoenescu
         div @rstoenescu
-  q-drawer.bg-white(v-model='rightDrawer', side='right', show-if-above, bordered)
+  //- Right Drawer
+  q-drawer.bg-white(v-model='rightDrawer', side='right', :width='250', show-if-above)
     Friends
+  //- Bottom Drawers
   q-dialog(v-model='newEvent', position='bottom')
     EventForm
+  //- Page container and floating buttons
   q-page-container
     router-view
     q-page-sticky(position='top-left', :offset='[18, 18]')

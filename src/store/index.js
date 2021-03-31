@@ -20,32 +20,38 @@ export default store(function (/* { ssrContext } */) {
           icon: 'account_circle',
           label: 'User Information',
           color: 'blue',
+          link: '/userinfo',
           separator: true
+        },
+        {
+            icon: 'settings',
+            label: 'Settings',
+            color: 'gray',
+            link: '',
+            separator: true
+          },
+        {
+            icon: 'help',
+            label: 'Privacy',
+            color: 'accent',
+            link: '',
+            separator: false
         },
         {
           icon: 'error',
           label: 'Report a Problem',
           color: 'red',
+          link: '',
           separator: true
         },
         {
           icon: 'feedback',
           label: 'Send Feedback',
           color: 'orange',
+          link: '',
           separator: false
         },
-        {
-          icon: 'help',
-          label: 'Help',
-          color: 'green',
-          separator: false
-        },
-        {
-          icon: 'settings',
-          label: 'Settings',
-          color: 'gray',
-          separator: false
-        }
+
       ],
       mapStyles: [
         {
