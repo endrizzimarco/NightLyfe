@@ -2,7 +2,7 @@
 q-card.full-width
   //- Create Event Header
   q-card-section.bg-blue-grey-1(style='padding: 8px')
-    span.text-subtitle1.text-weight-light.text-blue-grey-10 Create your event
+    span.text-subtitle1.text-weight-light.text-blue-grey-10.q-ml-sm Create your event
     q-chip.float-right(
       @click='submitEvent()',
       clickable,
@@ -52,9 +52,9 @@ q-card.full-width
       img(src='https://img.icons8.com/dusk/50/000000/home.png')
       img(src='https://img.icons8.com/dusk/50/000000/party-baloons.png')
       img(src='https://img.icons8.com/dusk/50/000000/dancing-party.png')
-      img(src='https://img.icons8.com/dusk/50/000000/cocktail.png')
-      img(src='https://img.icons8.com/dusk/50/000000/home.png')
-      img(src='https://img.icons8.com/wired/50/000000/cocktail.png')
+      img(src='https://img.icons8.com/dusk/50/000000/champagne.png')
+      img(src='https://img.icons8.com/dusk/50/000000/dj.png')
+      img(src='https://img.icons8.com/dusk/50/000000/gift.png')
     //- Event details field
     .row
       span.text-subtitle1.text-blue-grey-10 Details:
