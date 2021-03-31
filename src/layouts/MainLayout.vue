@@ -4,7 +4,7 @@ q-layout(view='lHh Lpr lFf')
     q-scroll-area(style='height: calc(100% - 150px); margin-top: 150px; border-right: 1px solid #ddd')
       q-list.padding
         template(v-for='(menuItem, index) in menuList', :key='index')
-          q-item(clickable, :active='menuItem.label === "Outbox"', v-ripple)
+          q-item(clickable, v-ripple)
             q-item-section(avatar)
               q-icon(:name='menuItem.icon', :color='menuItem.color')
             q-item-section
@@ -18,29 +18,38 @@ q-layout(view='lHh Lpr lFf')
         div @rstoenescu
   q-drawer.bg-white(v-model='rightDrawer', side='right', show-if-above, bordered)
     Friends
+  q-dialog(v-model='newEvent', position='bottom')
+    EventForm
   q-page-container
     router-view
     q-page-sticky(position='top-left', :offset='[18, 18]')
       q-btn(@click='leftDrawer = !leftDrawer', round, outline, color='cyan-1', icon='more_horiz')
-    q-page-sticky(position='bottom-right', :offset='[18, 36]')
+    q-page-sticky(position='bottom-right', :offset='[18, 105]')
       q-btn(@click='rightDrawer = !rightDrawer', fab, color='primary', icon='chat')
+    q-page-sticky(position='bottom', :offset='[18, 36]')
+      q-fab(vertical-actions-align='center', color='secondary', icon='add', direction='up')
+        q-fab-action(color='orange', @click='newEvent = true', icon='add_location', label='New Event')
+        q-fab-action(color='accent', icon='notification_add', label='New Signal')
 </template>
 
 <script>
 import Friends from 'components/Friends.vue'
+import EventForm from 'components/EventForm.vue'
 import { mapState } from 'vuex'
 
 export default {
   name: 'MainLayout',
 
   components: {
-    Friends
+    Friends,
+    EventForm
   },
 
   data() {
     return {
       leftDrawer: false,
-      rightDrawer: false
+      rightDrawer: false,
+      newEvent: false
     }
   },
 
