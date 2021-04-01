@@ -1,46 +1,69 @@
 <template lang="pug">
 q-layout(view='lHh Lpr lFf')
-  q-drawer.bg-white(v-model='leftDrawer', show-if-above, bordered, :width='200')
-    q-scroll-area(style='height: calc(100% - 150px); margin-top: 150px; border-right: 1px solid #ddd')
+  //- Left Drawer 
+  q-drawer.bg-white(v-model='leftDrawer', show-if-above, :width='200')
+    q-scroll-area(style='height: calc(100% - 150px); margin-top: 150px')
       q-list.padding
         template(v-for='(menuItem, index) in menuList', :key='index')
-          q-item(clickable, :active='menuItem.label === "Outbox"', v-ripple)
+          q-item(clickable, v-ripple, :to='menuItem.link')
             q-item-section(avatar)
               q-icon(:name='menuItem.icon', :color='menuItem.color')
             q-item-section
               | {{ menuItem.label }}
           q-separator(:key='"sep" + index', v-if='menuItem.separator')
-    q-img.absolute-top(src='https://cdn.quasar.dev/img/material.png', style='height: 150px')
-      .absolute-bottom.bg-transparent
-        q-avatar.q-mb-sm(size='56px')
-          img(src='https://cdn.quasar.dev/img/boy-avatar.png')
+    q-img.absolute-top(
+      src='https://i.pinimg.com/564x/a8/1e/01/a81e01701e045f8f70c71dd324c5a87a.jpg',
+      style='height: 150px'
+    )
+      .row.absolute-bottom.bg-transparent.justify-center
+        q-avatar(size='6.5em')
+          img(
+            src='https://avataaars.io/?avatarStyle=Circle&topType=Eyepatch&facialHairType=Blank&clotheType=ShirtVNeck&clotheColor=Pink&eyeType=Squint&eyebrowType=AngryNatural&mouthType=Default&skinColor=Light'
+          )
         .text-weight-bold Razvan Stoenescu
         div @rstoenescu
-  q-drawer.bg-white(v-model='rightDrawer', side='right', show-if-above, bordered)
+  //- Right Drawer
+  q-drawer.bg-white(v-model='rightDrawer', side='right', :width='250', show-if-above)
     Friends
+  //- Bottom Drawers
+  q-dialog(v-model='newEvent', position='bottom')
+    EventForm
+  q-dialog(v-model='newSignal', position='bottom')
+    SignalForm
+  //- Page container and floating buttons
   q-page-container
     router-view
     q-page-sticky(position='top-left', :offset='[18, 18]')
       q-btn(@click='leftDrawer = !leftDrawer', round, outline, color='cyan-1', icon='more_horiz')
-    q-page-sticky(position='bottom-right', :offset='[18, 36]')
+    q-page-sticky(position='bottom-right', :offset='[18, 105]')
       q-btn(@click='rightDrawer = !rightDrawer', fab, color='primary', icon='chat')
+    q-page-sticky(position='bottom', :offset='[18, 36]')
+      q-fab(vertical-actions-align='center', color='secondary', icon='add', direction='up')
+        q-fab-action(@click='newEvent = true', color='orange', icon='add_location', label='New Event')
+        q-fab-action(@click='newSignal = true', color='accent', icon='notification_add', label='New Signal')
 </template>
 
 <script>
 import Friends from 'components/Friends.vue'
+import EventForm from 'components/EventForm.vue'
+import SignalForm from 'components/SignalForm.vue'
 import { mapState } from 'vuex'
 
 export default {
   name: 'MainLayout',
 
   components: {
-    Friends
+    Friends,
+    EventForm,
+    SignalForm
   },
 
   data() {
     return {
       leftDrawer: false,
-      rightDrawer: false
+      rightDrawer: false,
+      newEvent: false,
+      newSignal: false
     }
   },
 
