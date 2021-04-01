@@ -16,7 +16,7 @@ q-layout(view='lHh Lpr lFf')
       style='height: 150px'
     )
       .row.absolute-bottom.bg-transparent.justify-center
-        q-avatar(size='7em')
+        q-avatar(size='6.5em')
           img(
             src='https://avataaars.io/?avatarStyle=Circle&topType=Eyepatch&facialHairType=Blank&clotheType=ShirtVNeck&clotheColor=Pink&eyeType=Squint&eyebrowType=AngryNatural&mouthType=Default&skinColor=Light'
           )
@@ -28,6 +28,8 @@ q-layout(view='lHh Lpr lFf')
   //- Bottom Drawers
   q-dialog(v-model='newEvent', position='bottom')
     EventForm
+  q-dialog(v-model='newSignal', position='bottom')
+    SignalForm
   //- Page container and floating buttons
   q-page-container
     router-view
@@ -37,13 +39,14 @@ q-layout(view='lHh Lpr lFf')
       q-btn(@click='rightDrawer = !rightDrawer', fab, color='primary', icon='chat')
     q-page-sticky(position='bottom', :offset='[18, 36]')
       q-fab(vertical-actions-align='center', color='secondary', icon='add', direction='up')
-        q-fab-action(color='orange', @click='newEvent = true', icon='add_location', label='New Event')
-        q-fab-action(color='accent', icon='notification_add', label='New Signal')
+        q-fab-action(@click='newEvent = true', color='orange', icon='add_location', label='New Event')
+        q-fab-action(@click='newSignal = true', color='accent', icon='notification_add', label='New Signal')
 </template>
 
 <script>
 import Friends from 'components/Friends.vue'
 import EventForm from 'components/EventForm.vue'
+import SignalForm from 'components/SignalForm.vue'
 import { mapState } from 'vuex'
 
 export default {
@@ -51,14 +54,16 @@ export default {
 
   components: {
     Friends,
-    EventForm
+    EventForm,
+    SignalForm
   },
 
   data() {
     return {
       leftDrawer: false,
       rightDrawer: false,
-      newEvent: false
+      newEvent: false,
+      newSignal: false
     }
   },
 
