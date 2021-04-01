@@ -28,8 +28,16 @@ q-card.full-width
     //- Date and Time field
     span.text-subtitle1.text-blue-grey-10.q-pt-sm Date and Time:
     .row.q-pb-md.no-wrap
-      q-input.full-width(v-model='date', rounded, outlined, type='date', :dense='true', hint='Date of Event')
-      q-input.q-ml-sm(v-model='time', rounded, outlined, type='time', :dense='true', hint='Time of the Event')
+      q-input(v-model='date', rounded, outlined, type='date', :dense='true', hint='Date of Event', style='width: 60%')
+      q-input.q-ml-sm(
+        v-model='time',
+        rounded,
+        outlined,
+        type='time',
+        :dense='true',
+        hint='Time of the Event',
+        style='width: 40%'
+      )
     //- Location of Event field
     .row.q-pb-md
       span.text-subtitle1.text-blue-grey-10 Where?:

@@ -18,15 +18,15 @@ export default store(function (/* { ssrContext } */) {
       menuList: [
         {
           icon: 'account_circle',
-          label: 'User Information',
+          label: 'User',
           color: 'blue',
           link: '/userinfo',
-          separator: true
+          separator: false
         },
         {
             icon: 'settings',
             label: 'Settings',
-            color: 'gray',
+            color: 'blue-grey-7',
             link: '',
             separator: true
           },
@@ -40,17 +40,24 @@ export default store(function (/* { ssrContext } */) {
         {
           icon: 'error',
           label: 'Report a Problem',
-          color: 'red',
+          color: 'red-6',
           link: '',
-          separator: true
+          separator: false
         },
         {
           icon: 'feedback',
           label: 'Send Feedback',
           color: 'orange',
           link: '',
-          separator: false
+          separator: true
         },
+        {
+        icon: 'login',
+        label: 'Login',
+        color: 'green',
+        link: '/auth',
+        separator: false
+      },
 
       ],
       mapStyles: [
