@@ -1,12 +1,12 @@
 <template lang="pug">
 q-form.q-pa-lg(@submit='submitForm')
-  q-input.q-mb-md(v-model='email', type='email', label='Email')
+  q-input.q-mb-md(v-model='formData.email', type='email', label='Email')
     template(v-slot:prepend)
       q-icon(name='email')
-  q-input.q-mb-md(v-model='username', v-if='tab == "register"', type='username', label='Username')
+  q-input.q-mb-md(v-model='formData.username', v-if='tab == "register"', type='username', label='Username')
     template(v-slot:prepend)
       q-icon(name='person')
-  q-input.q-mb-md(type='password', v-model='password', label='Password')
+  q-input.q-mb-md(type='password', v-model='formData.password', label='Password')
     template(v-slot:prepend)
       q-icon(name='lock')
   //- Register only
@@ -37,23 +37,28 @@ q-form.q-pa-lg(@submit='submitForm')
 </template>
 
 <script>
+import { mapActions } from 'vuex'
+
 export default {
   props: ['tab'],
   data() {
     return {
-      email: '',
-      username: '',
-      password: ''
+      formData: {
+        email: '',
+        username: '',
+        password: ''
+      }
     }
   },
   methods: {
     submitForm() {
       if (this.tab == 'login') {
-        console.log('login the user')
+        this.loginUser(this.formData)
       } else {
-        console.log('register the user')
+        this.registerUser(this.formData)
       }
-    }
+    },
+    ...mapActions('firebase', ['loginUser', 'registerUser'])
   }
 }
 </script>
