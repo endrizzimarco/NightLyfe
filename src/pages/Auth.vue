@@ -6,7 +6,7 @@ q-layout.shadow-2.rounded-borders(view='lHh Lpr lff')
     )
       q-card.full-width(style='max-width: 1024px')
         q-card-section.row.bg-primary.justify-center
-          h4.text-h4.text-white.q-my-lg Welcome to NightLyfe
+          h4.text-h4.text-white.q-my-lg.text-weight-light Welcome to NightLyfe
         q-tabs.text-grey(v-model='tab', active-color='primary', indicator-color='primary', align='justify')
           q-tab(name='login', label='Login')
           q-tab(name='register', label='Register')
