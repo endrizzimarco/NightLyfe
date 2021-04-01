@@ -10,6 +10,8 @@ q-list(bordered)
       q-item-label.text-weight-light.text-subtitle2 {{ user.name }}
     q-item-section(side)
       q-icon(name='chat_bubble', :color='user.online ? "light-green-6" : "blue-grey-5"')
+q-toolbar.absolute-bottom.bg-primary.text-white.shadow-2
+  q-btn(@click='addFriends()', icon='person_add', flat, dense, label='Add Friends')
 </template>
 
 <script>
@@ -38,6 +40,11 @@ export default {
           online: false
         }
       ]
+    }
+  },
+  methods: {
+    addFriends() {
+      console.log('clicked')
     }
   }
 }
