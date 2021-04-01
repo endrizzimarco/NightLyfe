@@ -27,7 +27,7 @@ export default {
     }
   },
   components: {
-    'login-register': require('components/Login').default
+    'login-register': require('components/LoginRegister').default
   }
 }
 </script>
