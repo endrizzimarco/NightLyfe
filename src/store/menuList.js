@@ -39,7 +39,7 @@ export default {
     icon: 'logout',
     label: 'Logout',
     color: 'black',
-    link: '/auth',
+    link: '',
     separator: false
     },
   ]

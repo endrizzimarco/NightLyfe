@@ -5,7 +5,12 @@ q-layout(view='lHh Lpr lFf')
     q-scroll-area(style='height: calc(100% - 150px); margin-top: 150px')
       q-list.padding
         template(v-for='(menuItem, index) in menuList', :key='index')
-          q-item(clickable, v-ripple, :to='menuItem.link')
+          q-item(
+            @click='menuItem.label == "Logout" ? (confirmLogout = true) : null',
+            clickable,
+            v-ripple,
+            :to='menuItem.link'
+          )
             q-item-section(avatar)
               q-icon(:name='menuItem.icon', :color='menuItem.color')
             q-item-section
@@ -16,12 +21,12 @@ q-layout(view='lHh Lpr lFf')
       style='height: 150px'
     )
       .row.absolute-bottom.bg-transparent.justify-center
-        q-avatar(size='6.5em')
+        q-avatar(size='6.5em', style='margin-top: -95px')
           img(
             src='https://avataaars.io/?avatarStyle=Circle&topType=Eyepatch&facialHairType=Blank&clotheType=ShirtVNeck&clotheColor=Pink&eyeType=Squint&eyebrowType=AngryNatural&mouthType=Default&skinColor=Light'
           )
-        .text-weight-bold Razvan Stoenescu
-        div @rstoenescu
+        .text-bold.full-width.text-center {{ userDetails.name }}
+        div {{ "@" + userDetails.username }}
   //- Right Drawer
   q-drawer.bg-white(v-model='rightDrawer', side='right', :width='250', show-if-above)
     Friends
@@ -30,6 +35,15 @@ q-layout(view='lHh Lpr lFf')
     EventForm
   q-dialog(v-model='newSignal', position='bottom')
     SignalForm
+  //- Confirm Logout popup
+  q-dialog(v-model='confirmLogout', persistent)
+    q-card
+      q-card-section.row.items-center.q-pa-sm
+        q-avatar(rounded, icon='no_accounts', color='red', text-color='white')
+        span.q-ml-sm Are you sure you want to logout?
+      q-card-actions(align='right')
+        q-btn(flat, label='Cancel', color='primary', v-close-popup)
+        q-btn(@click='handleLogout()', flat, label='Confirm', color='primary', v-close-popup)
   //- Page container and floating buttons
   q-page-container
     router-view
@@ -47,7 +61,7 @@ q-layout(view='lHh Lpr lFf')
 import Friends from 'components/Friends.vue'
 import EventForm from 'components/EventForm.vue'
 import SignalForm from 'components/SignalForm.vue'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   name: 'MainLayout',
@@ -63,12 +77,22 @@ export default {
       leftDrawer: false,
       rightDrawer: false,
       newEvent: false,
-      newSignal: false
+      newSignal: false,
+      confirmLogout: false
+    }
+  },
+
+  methods: {
+    handleLogout() {
+      this.$router.push('/auth')
+      this.logoutUser
     }
   },
 
   computed: {
-    ...mapState(['menuList'])
+    ...mapState(['menuList']),
+    ...mapState('firebase', ['userDetails']),
+    ...mapActions('firebase', ['logoutUser'])
   }
 }
 </script>
