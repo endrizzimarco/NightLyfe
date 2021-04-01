@@ -3,7 +3,7 @@ import { createStore } from 'vuex'
 
 import mapStyles from './mapStyles'
 import menuList from './menuList'
-import database from './database'
+import firebase from './firebase'
 
 // import example from './module-example'
 
@@ -23,7 +23,7 @@ export default store(function (/* { ssrContext } */) {
       menuList: menuList['data']
     },
     modules: {
-      database
+      firebase
     },
 
     // enable strict mode (adds overhead!)

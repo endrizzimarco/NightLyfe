@@ -13,13 +13,13 @@ import "firebase/database";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 var firebaseConfig = {
-  apiKey: "AIzaSyBPUdoB3wV6A9L-H1-J5POiQRmgqqcL9Bk",
-  authDomain: "nightlyfe-308016.firebaseapp.com",
-  projectId: "nightlyfe-308016",
-  storageBucket: "nightlyfe-308016.appspot.com",
-  messagingSenderId: "469882119194",
-  appId: "1:469882119194:web:4ead2d00c69be60ec41da3",
-  measurementId: "G-E6SZFDYGCD"
+  apiKey: "AIzaSyB9Dav9F3qIlHcu9s4zuYbkt5mYBdrHJws",
+  authDomain: "nightlyfe-117a4.firebaseapp.com",
+  projectId: "nightlyfe-117a4",
+  storageBucket: "nightlyfe-117a4.appspot.com",
+  messagingSenderId: "928276199112",
+  appId: "1:928276199112:web:a8f1a82e5a2b272eb917fd",
+  measurementId: "G-Q0NX15EQ0Z"
 };
 
 // Initialize Firebase
