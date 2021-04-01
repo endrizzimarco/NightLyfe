@@ -1,12 +1,14 @@
 {
   "users": {
     "USERID1": {
-      "name": "Ericsauce",
+      "name": "Eric Kostopolous",
+      "username": "Ericsauce",
       "email": "ericsauce@test.com",
       "online": true
     },
     "USERID2": {
       "name": "Jim",
+      "username": "Jimzalabim",
       "email": "jim@test.com",
       "online": true
     }
