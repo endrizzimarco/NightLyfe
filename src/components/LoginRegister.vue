@@ -1,17 +1,20 @@
 <template lang="pug">
 q-form.q-pa-lg(@submit='submitForm')
+  q-input.q-mb-md(v-model='formData.name', v-if='tab == "register"', type='name', label='Name')
+    template(v-slot:prepend)
+      q-icon(name='person')
+  q-input.q-mb-md(v-model='formData.username', v-if='tab == "register"', type='username', label='Username')
+    template(v-slot:prepend)
+      q-icon(name='alternate_email')
   q-input.q-mb-md(v-model='formData.email', type='email', label='Email')
     template(v-slot:prepend)
       q-icon(name='email')
-  q-input.q-mb-md(v-model='formData.username', v-if='tab == "register"', type='username', label='Username')
-    template(v-slot:prepend)
-      q-icon(name='person')
   q-input.q-mb-md(type='password', v-model='formData.password', label='Password')
     template(v-slot:prepend)
       q-icon(name='lock')
   //- Register only
   q-card-section(v-if='tab == "register"')
-    .text-center.q-pa-sm.q-gutter-xl
+    .text-center.q-py-sm.q-gutter-xl
       q-btn(round, color='indigo-7', size='lg')
         q-icon(name='fab fa-facebook-f', size='1.7rem')
       q-btn(round, color='red-8', size='lg')
@@ -44,8 +47,9 @@ export default {
   data() {
     return {
       formData: {
-        email: '',
+        name: '',
         username: '',
+        email: '',
         password: ''
       }
     }
