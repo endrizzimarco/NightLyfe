@@ -1,0 +1,40 @@
+{
+  "users": {
+    "USERID1": {
+      "name": "Ericsauce",
+      "email": "ericsauce@test.com",
+      "online": true
+    },
+    "USERID2": {
+      "name": "Jim",
+      "email": "jim@test.com",
+      "online": true
+    }
+  },
+  "chats": {
+    "USERID1": {
+      "USERID2": {
+        "MESSAGEID1": {
+          "text": "Why eric 'sauce'?",
+          "from": "them"
+        },
+        "MESSAGEID2": {
+          "text": "Spaget",
+          "from": "me"
+        }
+      }
+    },
+    "USERID2": {
+      "USERID1": {
+        "MESSAGEID1": {
+          "text": "Why eric 'sauce'?",
+          "from": "me"
+        },
+        "MESSAGEID2": {
+          "text": "Spaget",
+          "from": "them"
+        }
+      }
+    }
+  }
+}
