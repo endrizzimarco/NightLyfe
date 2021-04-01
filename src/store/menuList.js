@@ -36,11 +36,11 @@ export default {
       separator: true
     },
     {
-    icon: 'login',
-    label: 'Login',
-    color: 'green',
+    icon: 'logout',
+    label: 'Logout',
+    color: 'black',
     link: '/auth',
     separator: false
-  },
+    },
   ]
 }
