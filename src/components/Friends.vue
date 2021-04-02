@@ -2,7 +2,7 @@
 q-toolbar.bg-primary.text-white.shadow-2
   q-toolbar-title Contacts
 q-list(bordered)
-  q-item.q-my-sm(v-for='(user, key) in users', :key='key', to='/chat', clickable, v-ripple)
+  q-item.q-my-sm(v-for='(user, key) in users', :key='key', :to='"/chat/" + key', clickable, v-ripple)
     q-item-section(avatar)
       q-avatar(color='primary', text-color='white')
         | {{ user.name.charAt(0) }}

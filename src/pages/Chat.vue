@@ -17,24 +17,12 @@ q-footer(elevated)
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex'
+
 export default {
   data() {
     return {
-      newMessage: '',
-      messages: [
-        {
-          text: 'Hello',
-          from: 'me'
-        },
-        {
-          text: 'Hi',
-          from: 'them'
-        },
-        {
-          text: 'How are you?',
-          from: 'me'
-        }
-      ]
+      newMessage: ''
     }
   },
 
@@ -45,7 +33,21 @@ export default {
         from: 'me'
       })
       this.newMessage = ''
-    }
+    },
+    ...mapActions('firebase', ['firebaseGetMessages', 'firebaseStopGettingMessages'])
+  },
+
+  computed: {
+    ...mapState('firebase', ['messages'])
+  },
+
+  mounted() {
+    this.firebaseGetMessages(this.$route.params.otherUserId)
+  },
+
+  // Fire when the user leaves the page
+  unmounted() {
+    this.firebaseStopGettingMessages()
   }
 }
 </script>
