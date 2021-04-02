@@ -1,12 +1,12 @@
 <template lang="pug">
-q-banner.bg-grey-4.fixed-top(text-center='') User is Offline.
-.q-pa-md.column.col.justify-end
-  q-chat-message(
+q-page.q-pa-lg.column.justify-end
+  q-chat-message.text-weight-light(
     v-for='message in messages',
     :key='message.text',
-    :name='message.from',
+    :name='message.from == "me" ? userDetails.username : otherUserDetails.username',
     :text='[message.text]',
-    :sent='message.from == "me" ? true : false'
+    :sent='message.from == "me" ? true : false',
+    avatar='https://cdn.quasar.dev/img/avatar1.jpg'
   )
 q-footer(elevated)
   q-toolbar
@@ -18,8 +18,11 @@ q-footer(elevated)
 
 <script>
 import { mapState, mapActions } from 'vuex'
+import mixinOtherUserDetails from 'src/mixins/mixin-other-user-details.js'
 
 export default {
+  mixins: [mixinOtherUserDetails],
+
   data() {
     return {
       newMessage: ''
@@ -38,7 +41,7 @@ export default {
   },
 
   computed: {
-    ...mapState('firebase', ['messages'])
+    ...mapState('firebase', ['messages', 'userDetails'])
   },
 
   mounted() {
