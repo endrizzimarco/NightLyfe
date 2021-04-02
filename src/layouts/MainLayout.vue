@@ -85,14 +85,14 @@ export default {
   methods: {
     handleLogout() {
       this.$router.push('/auth')
-      this.logoutUser
-    }
+      this.logoutUser()
+    },
+    ...mapActions('firebase', ['logoutUser'])
   },
 
   computed: {
     ...mapState(['menuList']),
-    ...mapState('firebase', ['userDetails']),
-    ...mapActions('firebase', ['logoutUser'])
+    ...mapState('firebase', ['userDetails'])
   }
 }
 </script>
