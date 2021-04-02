@@ -1,21 +1,33 @@
 {
   "users": {
-    "USERID1": {
-      "name": "Eric Kostopolous",
-      "username": "Ericsauce",
-      "email": "ericsauce@test.com",
-      "online": true
+    "9HsxN1tMHNOfmQV3E16LNfcFTdc2": {
+      "name": "Test Name",
+      "username": "testusername",
+      "email": "test@test.com",
+      "online": false
     },
-    "USERID2": {
-      "name": "Jim",
-      "username": "Jimzalabim",
-      "email": "jim@test.com",
-      "online": true
+    "Oqk3C1ownieYIm8K0KgFqRXhKs53": {
+      "name": "Scientific Pig",
+      "username": "dontlookitup",
+      "email": "test3@test.com",
+      "online": false
+    },
+    "l7TY1PJocphLufQb3zN1tfRJYsy1": {
+      "name": "how is this working lmao",
+      "username": "amogus",
+      "email": "test4@test.com",
+      "online": false
+    },
+    "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": {
+      "name": "Eric Sauce",
+      "username": "theSaucer",
+      "email": "test2@test.com",
+      "online": false
     }
   },
   "chats": {
-    "USERID1": {
-      "USERID2": {
+    "9HsxN1tMHNOfmQV3E16LNfcFTdc2": {
+      "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": {
         "MESSAGEID1": {
           "text": "Why eric 'sauce'?",
           "from": "them"
@@ -26,8 +38,8 @@
         }
       }
     },
-    "USERID2": {
-      "USERID1": {
+    "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": {
+      "9HsxN1tMHNOfmQV3E16LNfcFTdc2": {
         "MESSAGEID1": {
           "text": "Why eric 'sauce'?",
           "from": "me"
