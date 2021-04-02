@@ -58,7 +58,7 @@ export default {
     submitForm() {
       if (this.tab == 'login') {
         this.loginUser(this.formData)
-      } else {
+      } else if (this.tab == 'register') {
         this.registerUser(this.formData)
       }
     },
