@@ -84,7 +84,7 @@ const actions = {
         dispatch('firebaseGetUsers')
         this.$router.push('/')
       }
-      else {
+      else if(state.userDetails.userId) {
         // User logged out
         dispatch('firebaseUpdateUser', {
           userId: state.userDetails.userId,
