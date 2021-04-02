@@ -8,6 +8,7 @@ q-list(bordered)
         | {{ user.name.charAt(0) }}
     q-item-section
       q-item-label.text-weight-light.text-subtitle2 {{ user.name }}
+      q-item-label(caption, lines='1') @{{ user.username }}
     q-item-section(side)
       q-icon(name='chat_bubble', :color='user.online ? "light-green-6" : "blue-grey-5"')
 q-toolbar.absolute-bottom.bg-primary.text-white.shadow-2
