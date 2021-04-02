@@ -11,7 +11,7 @@ export default {
         icon: 'settings',
         label: 'Settings',
         color: 'blue-grey-7',
-        link: '',
+        link: '/settings',
         separator: true
       },
     {
