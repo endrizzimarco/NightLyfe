@@ -1,0 +1,54 @@
+{
+  "users": {
+    "9HsxN1tMHNOfmQV3E16LNfcFTdc2": {
+      "name": "Test Name",
+      "username": "testusername",
+      "email": "test@test.com",
+      "online": false
+    },
+    "Oqk3C1ownieYIm8K0KgFqRXhKs53": {
+      "name": "Scientific Pig",
+      "username": "dontlookitup",
+      "email": "test3@test.com",
+      "online": false
+    },
+    "l7TY1PJocphLufQb3zN1tfRJYsy1": {
+      "name": "how is this working lmao",
+      "username": "amogus",
+      "email": "test4@test.com",
+      "online": false
+    },
+    "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": {
+      "name": "Eric Sauce",
+      "username": "theSaucer",
+      "email": "test2@test.com",
+      "online": false
+    }
+  },
+  "chats": {
+    "9HsxN1tMHNOfmQV3E16LNfcFTdc2": {
+      "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": {
+        "MESSAGEID1": {
+          "text": "Why eric 'sauce'?",
+          "from": "them"
+        },
+        "MESSAGEID2": {
+          "text": "Spaget",
+          "from": "me"
+        }
+      }
+    },
+    "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": {
+      "9HsxN1tMHNOfmQV3E16LNfcFTdc2": {
+        "MESSAGEID1": {
+          "text": "Why eric 'sauce'?",
+          "from": "me"
+        },
+        "MESSAGEID2": {
+          "text": "Spaget",
+          "from": "them"
+        }
+      }
+    }
+  }
+}
