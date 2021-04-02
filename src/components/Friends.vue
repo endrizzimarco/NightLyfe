@@ -2,7 +2,7 @@
 q-toolbar.bg-primary.text-white.shadow-2
   q-toolbar-title Contacts
 q-list(bordered)
-  q-item.q-my-sm(v-for='user in users', :key='user.id', to='/chat', clickable, v-ripple)
+  q-item.q-my-sm(v-for='(user, key) in users', :key='key', to='/chat', clickable, v-ripple)
     q-item-section(avatar)
       q-avatar(color='primary', text-color='white')
         | {{ user.name.charAt(0) }}
@@ -15,37 +15,17 @@ q-toolbar.absolute-bottom.bg-primary.text-white.shadow-2
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
-  data() {
-    return {
-      users: [
-        {
-          id: 1,
-          name: 'Marco Endrizzi',
-          online: true
-        },
-        {
-          id: 2,
-          name: 'Ahmed Henine',
-          online: true
-        },
-        {
-          id: 3,
-          name: 'Maya Meylan',
-          online: false
-        },
-        {
-          id: 4,
-          name: 'Gunes Kaan',
-          online: false
-        }
-      ]
-    }
-  },
   methods: {
     addFriends() {
       console.log('clicked')
     }
+  },
+
+  computed: {
+    ...mapGetters('firebase', ['users'])
   }
 }
 </script>
