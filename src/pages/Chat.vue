@@ -70,7 +70,7 @@ export default {
       let pageChat = this.$refs.pageChat.$el
       setTimeout(() => {
         window.scrollTo(0, pageChat.scrollHeight)
-      }, 20)
+      }, 100)
     },
 
     ...mapActions('firebase', ['firebaseGetMessages', 'firebaseStopGettingMessages', 'firebaseSendMessage'])
@@ -84,7 +84,7 @@ export default {
     this.firebaseGetMessages(this.$route.params.otherUserId)
     setTimeout(() => {
       this.scrollToBottom()
-    }, 120)
+    }, 150)
   },
 
   // Fire when the user leaves the page
