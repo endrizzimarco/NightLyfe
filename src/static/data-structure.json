@@ -66,5 +66,16 @@
         }
       }
     }
+  },
+  "friends": {
+    "9HsxN1tMHNOfmQV3E16LNfcFTdc2": {
+      "friendList": {
+        "Oqk3C1ownieYIm8K0KgFqRXhKs53": true,
+        "l7TY1PJocphLufQb3zN1tfRJYsy1": true
+      },
+      "pending": {
+        "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": true
+      }
+    }
   }
 }
