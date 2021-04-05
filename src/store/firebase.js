@@ -5,7 +5,9 @@ let messagesRef
 const state = {
   userDetails: {},
   users: {},
-  messages: {}
+  messages: {},
+  friends: {},
+  pending: {}
 }
 
 const mutations = {
@@ -15,6 +17,19 @@ const mutations = {
 
   addUser(state, payload) {
     state.users[payload.userId] = payload.userDetails
+  },
+
+  addFriend(state, payload) {
+    state.friends[payload.userId] = payload.userDetails
+  },
+
+  addPending(state, payload) {
+    state.pending[payload.userId] = payload.userDetails
+  },
+
+  removePending(state, payload) {
+    let key = payload
+    delete state.pending[key]
   },
 
   updateUser(state, payload) {
@@ -82,6 +97,7 @@ const actions = {
           }
         })
         dispatch('firebaseGetUsers')
+        dispatch('firebaseGetFriends', userId)
         this.$router.push('/')
       }
       else if(state.userDetails.userId) {
@@ -119,6 +135,49 @@ const actions = {
         userDetails
       })
     })
+  },
+
+  firebaseGetFriends({ commit }, payload) {
+    let userId = payload
+
+    firebaseDb.ref('friends/' + userId + '/friendList').on('child_added', snapshot => {
+      let otherUserId = snapshot.key
+      firebaseDb.ref('users').child(otherUserId).once('value', snapshot => {
+        let userDetails = snapshot.val()
+        commit('addFriend', {
+          userId: otherUserId, 
+          userDetails
+        })
+      })
+    })
+
+    firebaseDb.ref('friends/' + userId + '/pending').on('child_added', snapshot => {
+      let otherUserId = snapshot.key
+      firebaseDb.ref('users').child(otherUserId).once('value', snapshot => {
+        let userDetails = snapshot.val().username
+        commit('addPending', {
+          userId: otherUserId, 
+          userDetails
+        })
+      })
+    })
+  },
+
+
+  firebaseRemovePending({ state, commit }, payload) {
+    let otherUserId = payload
+    commit('removePending', payload)
+    firebaseDb.ref('friends/' + state.userDetails.userId + '/pending/' + otherUserId).remove()
+  },
+
+  firebaseAcceptRequest({ dispatch }, payload) {
+    dispatch('firebaseRemovePending', payload)
+
+    let friendId = payload
+    let friendObject = {}
+    friendObject[friendId] = true
+    
+    firebaseDb.ref('friends/' + state.userDetails.userId + '/friendList').update(friendObject)
   },
 
   firebaseGetMessages({ state, commit }, otherUserId) {
