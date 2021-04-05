@@ -4,7 +4,6 @@ let messagesRef
 
 const state = {
   userDetails: {},
-  users: {},
   messages: {},
   friends: {},
   pending: {}
@@ -13,10 +12,6 @@ const state = {
 const mutations = {
   setUserDetails(state, payload) {
     state.userDetails = payload
-  },
-
-  addUser(state, payload) {
-    state.users[payload.userId] = payload.userDetails
   },
 
   addFriend(state, payload) {
@@ -30,10 +25,6 @@ const mutations = {
   removePending(state, payload) {
     let key = payload
     delete state.pending[key]
-  },
-
-  updateUser(state, payload) {
-    Object.assign(state.users[payload.userId], payload.userDetails)
   },
 
   addMessage(state, payload) {
@@ -96,7 +87,6 @@ const actions = {
             online: true
           }
         })
-        dispatch('firebaseGetUsers')
         dispatch('firebaseGetFriends', userId)
         this.$router.push('/')
       }
@@ -116,25 +106,6 @@ const actions = {
 
   firebaseUpdateUser({}, payload) {
     firebaseDb.ref('users/' + payload.userId).update(payload.updates)
-  },
-
-  firebaseGetUsers({ commit }) {
-    firebaseDb.ref('users').on('child_added', snapshot => {
-      let userDetails = snapshot.val()
-      let userId = snapshot.key
-      commit('addUser', {
-        userId,
-        userDetails
-      })
-    })
-    firebaseDb.ref('users').on('child_changed', snapshot => {
-      let userDetails = snapshot.val()
-      let userId = snapshot.key
-      commit('updateUser', {
-        userId,
-        userDetails
-      })
-    })
   },
 
   firebaseGetFriends({ commit }, payload) {
@@ -163,6 +134,17 @@ const actions = {
     })
   },
 
+  async firebaseSendFriendRequest({ state }, payload) {
+    let otherUsername = payload 
+    let requestObject = {}
+    requestObject[state.userDetails.userId] = true
+    
+    const snapshot = await firebaseDb.ref('users').orderByChild('username').equalTo(otherUsername).once('value')
+
+    let otherUserId = Object.keys(snapshot.val())[0]    
+    firebaseDb.ref('friends/' + otherUserId + '/pending').update(requestObject)
+  },
+
 
   firebaseRemovePending({ state, commit }, payload) {
     let otherUserId = payload
@@ -176,8 +158,13 @@ const actions = {
     let friendId = payload
     let friendObject = {}
     friendObject[friendId] = true
-    
+  
     firebaseDb.ref('friends/' + state.userDetails.userId + '/friendList').update(friendObject)
+
+    friendObject = {}
+    friendObject[state.userDetails.userId] = true
+
+    firebaseDb.ref('friends/' + friendId + '/friendList').update(friendObject)
   },
 
   firebaseGetMessages({ state, commit }, otherUserId) {
@@ -211,15 +198,6 @@ const actions = {
 }
 
 const getters = {
-  users: state => {
-    let usersFiltered = {}
-    Object.keys(state.users).forEach(key => {
-      if (key !== state.userDetails.userId) {
-        usersFiltered[key] = state.users[key]
-      }
-    })
-    return usersFiltered
-  },
   userDetailsKeys: state => {
     return Object.keys(state.userDetails)
   }
