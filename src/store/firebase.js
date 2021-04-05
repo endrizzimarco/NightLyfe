@@ -160,6 +160,9 @@ const getters = {
       }
     })
     return usersFiltered
+  },
+  userDetailsKeys: state => {
+    return Object.keys(state.userDetails)
   }
 }
 
