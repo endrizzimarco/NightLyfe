@@ -1,6 +1,8 @@
 <template lang='pug'>
-//- q-btn.bg-grey-2f.float-left.q-ma-sm(@click='$router.go(-1)', icon='arrow_back', label='Back')
-q-list.q-pa-sm(bordered, style='max-width: 1000px')
+q-btn.bg-grey-2f.float-left.q-ma-sm(@click='$router.go(-1)', icon='arrow_back', label='Back')
+br
+br
+q-list.q-pa-sm(style='max-width: 1000px')
   q-item-label.text-h5(header) Settings
   q-item-label(header) User Controls
   q-item
