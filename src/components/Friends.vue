@@ -11,7 +11,7 @@ q-list(bordered)
       q-item-label(caption, lines='1') @{{ user.username }}
     q-item-section(side)
       q-icon(name='chat_bubble', :color='user.online ? "light-green-6" : "blue-grey-5"')
-q-item.absolute-bottom.q-mb-xl(v-if='pending', v-for='(user, key) in pending', :key='key')
+q-item.absolute-bottom.q-mb-xl(v-for='(user, key) in pending', :key='key')
   .text-weight-light.text-subtitle1 {{ user }}
     q-icon.q-pl-sm.cursor-pointer(
       @click='acceptRequest(key)',
@@ -23,7 +23,7 @@ q-item.absolute-bottom.q-mb-xl(v-if='pending', v-for='(user, key) in pending', :
     q-icon.cursor-pointer(@click='denyRequest(key)', name='highlight_off', color='red', size='1.5rem')
 q-toolbar.absolute-bottom.bg-primary.text-white.shadow-2
   q-btn(icon='person_add', flat, dense, label='Add Friends')
-  q-popup-edit.full-width(v-model='usernameInput', :cover='false', v-slot='scope', @keyup.enter='showNotif()')
+  q-popup-edit(v-model='usernameInput', :cover='false', v-slot='scope', @keyup.enter='sendRequest()')
     q-input(v-model='scope.value', dense, autofocus, counter, @keyup.enter='scope.set')
       template(v-slot:prepend)
         q-icon(name='person_add', color='primary')
@@ -41,8 +41,6 @@ export default {
 
   methods: {
     showNotif() {
-      this.usernameInput = '@'
-
       this.$q.notify({
         message: 'Friend Request Sent',
         color: 'pink',
@@ -60,7 +58,11 @@ export default {
     denyRequest(otherUserId) {
       this.firebaseRemovePending(otherUserId)
     },
-    ...mapActions('firebase', ['firebaseRemovePending', 'firebaseAcceptRequest'])
+    sendRequest() {
+      this.showNotif()
+      this.firebaseSendFriendRequest(this.usernameInput.slice(1))
+    },
+    ...mapActions('firebase', ['firebaseRemovePending', 'firebaseAcceptRequest', 'firebaseSendFriendRequest'])
   },
 
   computed: {
