@@ -4,24 +4,40 @@
       "name": "Test Name",
       "username": "testusername",
       "email": "test@test.com",
+      "phone": null,
+      "dob": null,
+      "gender": null,
+      "description": null,
       "online": false
     },
     "Oqk3C1ownieYIm8K0KgFqRXhKs53": {
       "name": "Scientific Pig",
       "username": "dontlookitup",
       "email": "test3@test.com",
+      "phone": null,
+      "dob": null,
+      "gender": null,
+      "description": null,
       "online": false
     },
     "l7TY1PJocphLufQb3zN1tfRJYsy1": {
       "name": "how is this working lmao",
       "username": "amogus",
       "email": "test4@test.com",
+      "phone": null,
+      "dob": null,
+      "gender": null,
+      "description": null,
       "online": false
     },
     "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": {
       "name": "Eric Sauce",
       "username": "theSaucer",
       "email": "test2@test.com",
+      "phone": null,
+      "dob": null,
+      "gender": null,
+      "description": null,
       "online": false
     }
   },
@@ -48,6 +64,17 @@
           "text": "Spaget",
           "from": "them"
         }
+      }
+    }
+  },
+  "friends": {
+    "9HsxN1tMHNOfmQV3E16LNfcFTdc2": {
+      "friendList": {
+        "Oqk3C1ownieYIm8K0KgFqRXhKs53": true,
+        "l7TY1PJocphLufQb3zN1tfRJYsy1": true
+      },
+      "pending": {
+        "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": true
       }
     }
   }
