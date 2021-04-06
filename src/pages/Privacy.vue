@@ -1,5 +1,5 @@
 <template lang="pug">
-h4(class='title') <mark>Privacy policy:</mark>
+h4(class='title') <mark>Privacy Policy:</mark>
 div(class='policy')
   p We recomand our users to read our privacy policy <b>very carfully</b> and contact us if they have any enquiries. 
   p One of our agents will be pleased to answer all of your questions ! 
@@ -22,6 +22,7 @@ div(class='policy')
   p In case this application goes internationally and gets worldwildly used, your data might be transfered to an other country for some legal purposes but we will always continue protecting your information with appropriate safeguards, but it may be subject to the legal jurisdiction of those countries and governmental authorities in those countries.
   <br>
 
+q-btn.bg-grey-2.fixed-down-left.q-ma-sm(@click='$router.go(-1)', icon='arrow_back', label='Back')
 </template>
 
 <script>
