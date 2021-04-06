@@ -18,6 +18,7 @@ p <b>How do we retain your personal information</b>
 p We retain personal information regarding you or your use of the Services for as long as your Account is active or for as long as needed to provide you or our Users with the Services. We also retain personal information for as long as necessary to achieve the purposes described in this Privacy Policy, for example, to comply with our legal obligations, to protect us in the event of disputes and to enforce our agreements and to protect our and others’ interests. You may delete your Account by contacting us at 'help' section on the application and we will delete the personal information it holds about you (unless we need to retain it for the purposes set out in this Privacy Policy). <br>Please note that in the course of providing the Services, we collect and maintain aggregated, anonymized or de-personalized information which we may retain indefinitely.
 <br>
 p <b>Data transfers</b>
+p In case this application goes internationally and gets worldwildly used, your data might be transfered to an other country for some legal purposes but we will always continue protecting your information with appropriate safeguards, but it may be subject to the legal jurisdiction of those countries and governmental authorities in those countries.
 <br>
 
 </template>
