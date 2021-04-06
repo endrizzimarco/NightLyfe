@@ -41,13 +41,11 @@ export default {
     toggleHeatmap() {
       this.heatmap.setMap(this.heatmap.getMap() ? null : this.map)
     },
-
     // Centers the map on user position when the button is presed
     centerMap() {
       this.map.setCenter(new google.maps.LatLng(this.center.lat, this.center.lng))
       this.map.setZoom(15)
     },
-
     /*********************
       APIs IMPLEMENTATION
     **********************/
@@ -149,27 +147,12 @@ export default {
         map: map
       })
 
-      // Add marker for every nightlife establishment along with an info window
+      // Wait for google Places API to be finished fetching relevant data
       await this.findPlaces()
-      this.places.forEach(place => {
-        const lat = place.geometry.location.lat
-        const lng = place.geometry.location.lng
-
-        let marker = new google.maps.Marker({
-          position: new google.maps.LatLng(lat, lng),
-          map: map,
-          icon: this.getPlaceIcon(place)
-        })
-
-        google.maps.event.addListener(marker, 'click', () => {
-          infoWindow.setContent(
-            `<div class="row nowrap"><div class="col"> ${this.getPlaceImage(place)} ${this.isPlaceOpen(place)}</div>
-            <div class="col-7"> <p class="text-subtitle2">${place.name}</p>
-            <p class="text-weight-light">${place.vicinity}</p> <p>${place.rating} ⭐</p></div></div>`
-          )
-          infoWindow.open(map, marker)
-        })
-      })
+      // Initialize all relevant places on map
+      this.initializePlaces(map)
+      // Initialize all relevant signals on the map
+      this.initializeSignals(map)
 
       // Create a heatmap based on crimes location
       await this.getCrimeData()
@@ -190,9 +173,52 @@ export default {
       this.heatmap = heatmap
       this.map = map
     },
+    // Creates markers and infoWindows for every relevant nightlife establishment in the area
+    initializePlaces(map) {
+      this.places.forEach(place => {
+        const lat = place.geometry.location.lat
+        const lng = place.geometry.location.lng
 
+        let marker = new google.maps.Marker({
+          position: new google.maps.LatLng(lat, lng),
+          map: map,
+          icon: this.getPlaceIcon(place)
+        })
+
+        google.maps.event.addListener(marker, 'click', () => {
+          infoWindow.setContent(
+            `<div class="row nowrap"><div class="col"> ${this.getPlaceImage(place)} ${this.isPlaceOpen(place)}</div>
+            <div class="col-7"> <p class="text-subtitle2">${place.name}</p>
+            <p class="text-weight-light">${place.vicinity}</p> <p>${place.rating} ⭐</p></div></div>`
+          )
+          infoWindow.open(map, marker)
+        })
+      })
+    },
+    // Creates markers and infoWindows for every signal in the area
+    initializeSignals(map) {
+      var infoWindow = new google.maps.InfoWindow()
+
+      for (const signalId in this.signals) {
+        let signal = this.signals[signalId]
+
+        let marker = new google.maps.Marker({
+          position: new google.maps.LatLng(signal.lat, signal.lng),
+          map: map,
+          icon: this.getSignalIcon(signal.type)
+        })
+
+        google.maps.event.addListener(marker, 'click', () => {
+          infoWindow.setContent(
+            `<p class="text-subtitle1" style="margin-bottom:8px;">${signal.type}</p>
+            <p class="text-weight-light">${signal.details}</p>`
+          )
+          infoWindow.open(map, marker)
+        })
+      }
+    },
     /*********************
-      GET PLACE'S DETAILS
+      GET PLACES DETAILS
     **********************/
     // Return html element, either Open or closed
     isPlaceOpen(place) {
@@ -225,11 +251,29 @@ export default {
         icon = 'https://img.icons8.com/color/40/000000/food-and-wine.png'
       }
       return icon
+    },
+    /*********************
+      GET SIGNAL ICON
+    **********************/
+    getSignalIcon(signalType) {
+      switch (signalType) {
+        case 'Danger':
+          return 'https://img.icons8.com/color/50/000000/error--v1.png'
+        case 'Emergency':
+          return 'https://img.icons8.com/color/50/000000/ambulance.png'
+        case 'Fight Breakout':
+          return 'https://img.icons8.com/color/50/000000/judo.png'
+        case 'Free Drinks':
+          return 'https://img.icons8.com/color/50/000000/dizzy-person.png'
+        case 'Car Rental':
+          return 'https://img.icons8.com/color/50/000000/car-rental.png'
+      }
     }
   },
 
   computed: {
-    ...mapState(['mapStyles'])
+    ...mapState(['mapStyles']),
+    ...mapState('firebase', ['signals'])
   },
 
   async mounted() {
