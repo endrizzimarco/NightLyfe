@@ -1,18 +1,6 @@
 <template lang="pug">
-h4 Privacy: 
-p This section is reserved for our users' privacy !
-p Please, add some privacy informations down here that might help securing more your account. 
-br 
-p Contact number: 
-q-input(rounded filled v-model="text" label="Phone number:")
-</template>
+h4 <mark>Privacy policy:</mark> 
+p We recomand our users to read our privacy policy <b>very carfully</b> and contact us if they have any enquiries. 
+p One of our agents will be pleased to answer all of your questions ! 
 
-<script>
-export default {
-  data () {
-    return {
-      text: ''
-    }
-  }
-}
-</script>
+</template>
