@@ -22,10 +22,10 @@ export default {
         separator: false
     },
     {
-      icon: 'error',
-      label: 'Report a Problem',
+      icon: 'supervisor_account',
+      label: 'Contact Us',
       color: 'red-6',
-      link: '',
+      link: '/ContactUs',
       separator: false
     },
     {
