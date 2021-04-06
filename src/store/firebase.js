@@ -6,37 +6,48 @@ const state = {
   userDetails: {},
   messages: {},
   friends: {},
-  pending: {}
+  pending: {},
+  signals: {1: {lat: 51.234100, lng: -0.570409, details: 'WAOW', type: 'Fight Breakout'}}
 }
 
 const mutations = {
+  // Assigns userDetails' value to given payload
   setUserDetails(state, payload) {
     state.userDetails = payload
   },
-
+  // Adds a message in 'messages' object
+  addMessage(state, payload) {
+    state.messages[payload.messageId] = payload.messageDetails
+  },
+  // Assign an empty object to 'messages', effectively clearing all saved messages
+  clearMessages(state) {
+    state.messages = {}
+  },
+  // Adds a friend details to 'friends' object
   addFriend(state, payload) {
     state.friends[payload.userId] = payload.userDetails
   },
-
+  // Modify friends' online status as they go offline / get online
+  updateFriendStatus(state, payload) {
+    state.friends[payload.userId].online = payload.online
+  },
+  // Adds a pending friend request in 'pending' object
   addPending(state, payload) {
     state.pending[payload.userId] = payload.userDetails
   },
-
+  // Removes a pending friend request from 'pending' object 
   removePending(state, payload) {
     let key = payload
     delete state.pending[key]
   },
-
-  addMessage(state, payload) {
-    state.messages[payload.messageId] = payload.messageDetails
-  },
-
-  clearMessages(state) {
-    state.messages = {}
+  // Adds a signal in 'signals' object
+  addSignal(state, payload) {
+    state.signals[payload.signalId] = payload.signalDetails
   }
 }
 
 const actions = {
+  // Call firebase auth method to login a user
   loginUser({}, payload) {
     firebaseAuth.signInWithEmailAndPassword(payload.email, payload.password)
       .then(response => {
@@ -46,11 +57,12 @@ const actions = {
         console.log(error.message)
       })
   },
-
+  // Call firebase auth method to logout a user
   logoutUser({}, payload) {
     firebaseAuth.signOut()
   },
-
+  // Call firebase auth method to register a user with email and password and
+  // create an instance of the new user in the Realtime Database
   registerUser({}, payload) {
     firebaseAuth.createUserWithEmailAndPassword(payload.email, payload.password)
       .then(response => {
@@ -59,18 +71,20 @@ const actions = {
           name: payload.name,
           username: payload.username,
           email: payload.email,
-          online: true
+        })
+        firebaseDb.ref('status/' + userId).set({
+          online: true,
         })
       })
       .catch(error => {
         console.log(error.message)
       })
   },
-
+  // YAAY
   handleAuthStateChanged({ state, commit, dispatch }) {
     firebaseAuth.onAuthStateChanged(user => {
+      // If user is logged in
       if(user) {
-        // User logged in
         let userId = firebaseAuth.currentUser.uid
         firebaseDb.ref('users/' + userId).once('value', snapshot => {
           let userDetails = snapshot.val()
@@ -81,34 +95,37 @@ const actions = {
             userId: userId
           })
         })
-        dispatch('firebaseUpdateUser', {
-          userId: userId,
-          updates: {
-            online: true
-          }
-        })
         dispatch('firebaseGetFriends', userId)
-        this.$router.push('/')
-      }
-      else if(state.userDetails.userId) {
-        // User logged out
-        dispatch('firebaseUpdateUser', {
-          userId: state.userDetails.userId,
-          updates: {
-            online: false
+        
+        // Handle online status
+        firebaseDb.ref('.info/connected').on('value', (snap) => {
+          if (snap.val() === true) {
+            // Change online to true when app is open
+            firebaseDb.ref('status/' + userId).update({online: true})
+            // Set online status to false when connection to firebase is lost
+            firebaseDb.ref('status/' + userId).onDisconnect().update({online: false})
           }
-        })
+        });
+        this.$router.push('/')
+        
+      }
+      // Else if user has logged out
+      else if(state.userDetails.userId) {
+        firebaseDb.ref('status/' + state.userDetails.userId).update({online: false})
         commit('setUserDetails', {})
+        this.$router.replace('/auth')
+      }
+      // Else if user does not have account send him to registration
+      else {
         this.$router.replace('/auth')
       }
     })
   },
-
+  // Updates details of user at given userId node 
   firebaseUpdateUser({}, payload) {
     firebaseDb.ref('users/' + payload.userId).update(payload.updates)
   },
-
-  firebaseGetFriends({ commit }, payload) {
+  firebaseGetFriends({ commit, dispatch}, payload) {
     let userId = payload
 
     firebaseDb.ref('friends/' + userId + '/friendList').on('child_added', snapshot => {
@@ -120,6 +137,7 @@ const actions = {
           userDetails
         })
       })
+      dispatch('firebaseTrackOnlineStatus', otherUserId)
     })
 
     firebaseDb.ref('friends/' + userId + '/pending').on('child_added', snapshot => {
@@ -144,14 +162,24 @@ const actions = {
     let otherUserId = Object.keys(snapshot.val())[0]    
     firebaseDb.ref('friends/' + otherUserId + '/pending').update(requestObject)
   },
-
-
+  // Remove pending request from firebase's Realtime Database and local state
   firebaseRemovePending({ state, commit }, payload) {
     let otherUserId = payload
     commit('removePending', payload)
     firebaseDb.ref('friends/' + state.userDetails.userId + '/pending/' + otherUserId).remove()
   },
-
+  firebaseTrackOnlineStatus({ commit }, payload) {
+    let userId = payload 
+    
+    firebaseDb.ref('status/' + userId).on('value', snapshot => {
+      let status = snapshot.val()
+      commit('updateFriendStatus', {
+        userId: userId, 
+        online: status.online
+      })
+    })
+  },
+  // Removes pending request and adds new friend to Realtime Database + local state
   firebaseAcceptRequest({ dispatch }, payload) {
     dispatch('firebaseRemovePending', payload)
 
@@ -165,6 +193,7 @@ const actions = {
     friendObject[state.userDetails.userId] = true
 
     firebaseDb.ref('friends/' + friendId + '/friendList').update(friendObject)
+    dispatch('firebaseTrackOnlineStatus', friendId)
   },
 
   firebaseGetMessages({ state, commit }, otherUserId) {
