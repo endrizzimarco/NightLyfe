@@ -15,6 +15,7 @@ p <b>Security</b>
 p The protection of your personal information is our priority. For security of transactions, we use high security protocols, which encrypt any personal information you enter into registration forms on the Application. The encryption process protects your information, by scrambling it before it is sent to us from your computer. We also make commercially reasonable effort to ensure the security of your personal information on our system. While we strive to protect your personal information, we will also do our best to secure any information you transmit to us.
 <br>
 p <b>How do we retain your personal information</b>
+p We retain personal information regarding you or your use of the Services for as long as your Account is active or for as long as needed to provide you or our Users with the Services. We also retain personal information for as long as necessary to achieve the purposes described in this Privacy Policy, for example, to comply with our legal obligations, to protect us in the event of disputes and to enforce our agreements and to protect our and others’ interests. You may delete your Account by contacting us at 'help' section on the application and we will delete the personal information it holds about you (unless we need to retain it for the purposes set out in this Privacy Policy). <br>Please note that in the course of providing the Services, we collect and maintain aggregated, anonymized or de-personalized information which we may retain indefinitely.
 <br>
 p <b>Data transfers</b>
 <br>
