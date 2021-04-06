@@ -18,7 +18,7 @@ export default {
         icon: 'help',
         label: 'Privacy',
         color: 'accent',
-        link: '',
+        link: '/privacy',
         separator: false
     },
     {
