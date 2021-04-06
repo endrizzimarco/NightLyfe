@@ -20,12 +20,19 @@ div(class='policy')
   <br>
   p <b>Data transfers</b>
   p In case this application goes internationally and gets worldwildly used, your data might be transfered to an other country for some legal purposes but we will always continue protecting your information with appropriate safeguards, but it may be subject to the legal jurisdiction of those countries and governmental authorities in those countries.
-  <br>
-
+<br>
+<q-checkbox dense v-model="teal" label="Please check the box if your have read our policy" color="teal" />
 q-btn.bg-grey-2.fixed-down-left.q-ma-sm(@click='$router.go(-1)', icon='arrow_back', label='Back')
 </template>
 
 <script>
+export default {
+  data () {
+    return {
+      teal: false,
+    }
+  }
+}
 </script>
 
 <style>
