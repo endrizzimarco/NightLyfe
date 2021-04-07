@@ -135,7 +135,6 @@ export default {
     // Initialize stylized map, nightlife places markers and crime heatmap
     async initMap() {
       var heatmapData = []
-      var infoWindow = new google.maps.InfoWindow()
       // Initialize the map instance, load the styles from the vuex store
       var map = new google.maps.Map(this.$refs['map'], {
         center: new google.maps.LatLng(this.center.lat, this.center.lng),
@@ -150,12 +149,20 @@ export default {
         map: map
       })
 
+      // Save heatmap and map instance for use in toggleHeatmap()
+      this.heatmap = heatmap
+      this.map = map
+
       // Wait for google Places API to be finished fetching relevant data
       await this.findPlaces()
       // Initialize all relevant places on map
-      this.initializePlaces(map)
+      this.initPlaces()
+
       // Initialize all relevant signals on the map
-      this.initializeSignals(map)
+      for (const i in this.signals) {
+        let signal = this.signals[i]
+        this.mapsAddSignal(signal)
+      }
 
       // Create a heatmap based on crimes location
       await this.getCrimeData()
@@ -171,20 +178,18 @@ export default {
       })
       heatmap.set('radius', heatmap.get('radius') ? null : 80)
       heatmap.set('opacity', heatmap.get('opacity') ? null : 0.3)
-
-      // Save heatmap and map instance for use in toggleHeatmap()
-      this.heatmap = heatmap
-      this.map = map
     },
     // Creates markers and infoWindows for every relevant nightlife establishment in the area
-    initializePlaces(map) {
+    initPlaces() {
+      var infoWindow = new google.maps.InfoWindow()
+
       this.places.forEach(place => {
         const lat = place.geometry.location.lat
         const lng = place.geometry.location.lng
 
         let marker = new google.maps.Marker({
           position: new google.maps.LatLng(lat, lng),
-          map: map,
+          map: this.map,
           icon: this.getPlaceIcon(place)
         })
 
@@ -194,31 +199,26 @@ export default {
             <div class="col-7"> <p class="text-subtitle2">${place.name}</p>
             <p class="text-weight-light">${place.vicinity}</p> <p>${place.rating} ⭐</p></div></div>`
           )
-          infoWindow.open(map, marker)
+          infoWindow.open(this.map, marker)
         })
       })
     },
-    // Creates markers and infoWindows for every signal in the area
-    initializeSignals(map) {
+    mapsAddSignal(signal) {
       var infoWindow = new google.maps.InfoWindow()
 
-      for (const signalId in this.signals) {
-        let signal = this.signals[signalId]
+      let marker = new google.maps.Marker({
+        position: new google.maps.LatLng(signal.lat, signal.lng),
+        map: this.map,
+        icon: this.getSignalIcon(signal.type)
+      })
 
-        let marker = new google.maps.Marker({
-          position: new google.maps.LatLng(signal.lat, signal.lng),
-          map: map,
-          icon: this.getSignalIcon(signal.type)
-        })
-
-        google.maps.event.addListener(marker, 'click', () => {
-          infoWindow.setContent(
-            `<p class="text-subtitle1" style="margin-bottom:8px;">${signal.type}</p>
+      google.maps.event.addListener(marker, 'click', () => {
+        infoWindow.setContent(
+          `<p class="text-subtitle1" style="margin-bottom:8px;">${signal.type}</p>
             <p class="text-weight-light">${signal.details}</p>`
-          )
-          infoWindow.open(map, marker)
-        })
-      }
+        )
+        infoWindow.open(this.map, marker)
+      })
     },
     /*********************
       GET PLACES DETAILS
@@ -277,7 +277,17 @@ export default {
 
   computed: {
     ...mapState(['mapStyles']),
-    ...mapState('firebase', ['center', 'signals'])
+    ...mapState('firebase', ['center', 'signals', 'latestSignalKey'])
+  },
+
+  watch: {
+    signals: {
+      deep: true,
+      handler() {
+        let signal = this.signals[this.latestSignalKey]
+        this.mapsAddSignal(signal)
+      }
+    }
   },
 
   async mounted() {
