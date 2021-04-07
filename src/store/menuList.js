@@ -32,7 +32,7 @@ export default {
       icon: 'feedback',
       label: 'Send Feedback',
       color: 'orange',
-      link: '',
+      link: '/sendfeedback',
       separator: true
     },
     {
