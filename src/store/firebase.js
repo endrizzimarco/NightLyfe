@@ -4,6 +4,7 @@ let messagesRef
 
 const state = {
   userDetails: {},
+  center: {},
   messages: {},
   friends: {},
   pending: {},
@@ -14,6 +15,10 @@ const mutations = {
   // Assigns userDetails' value to given payload
   setUserDetails(state, payload) {
     state.userDetails = payload
+  },
+   // Assigns center' value to current lat and long of user
+  setUserCenter(state, payload) {
+    state.center = payload
   },
   // Adds a message in 'messages' object
   addMessage(state, payload) {
@@ -194,6 +199,18 @@ const actions = {
 
     firebaseDb.ref('friends/' + friendId + '/friendList').update(friendObject)
     dispatch('firebaseTrackOnlineStatus', friendId)
+  },
+
+  firebaseSendSignal({ state, commit }, payload) {
+
+  },
+
+  firebaseSavePosition({ state, commit }, payload) {
+    let center = payload
+
+    firebaseDb.ref('status/' + state.userDetails.userId).update({position: center})
+
+    commit('setUserCenter', center)
   },
 
   firebaseGetMessages({ state, commit }, otherUserId) {
