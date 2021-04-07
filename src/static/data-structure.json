@@ -7,8 +7,7 @@
       "phone": null,
       "dob": null,
       "gender": null,
-      "description": null,
-      "online": false
+      "description": null
     },
     "Oqk3C1ownieYIm8K0KgFqRXhKs53": {
       "name": "Scientific Pig",
@@ -17,8 +16,7 @@
       "phone": null,
       "dob": null,
       "gender": null,
-      "description": null,
-      "online": false
+      "description": null
     },
     "l7TY1PJocphLufQb3zN1tfRJYsy1": {
       "name": "how is this working lmao",
@@ -27,8 +25,7 @@
       "phone": null,
       "dob": null,
       "gender": null,
-      "description": null,
-      "online": false
+      "description": null
     },
     "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": {
       "name": "Eric Sauce",
@@ -37,8 +34,7 @@
       "phone": null,
       "dob": null,
       "gender": null,
-      "description": null,
-      "online": false
+      "description": null
     }
   },
   "chats": {
@@ -77,5 +73,11 @@
         "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": true
       }
     }
+  },
+  "status": {
+    "9HsxN1tMHNOfmQV3E16LNfcFTdc2": false,
+    "Oqk3C1ownieYIm8K0KgFqRXhKs53": false, 
+    "l7TY1PJocphLufQb3zN1tfRJYsy1": false, 
+    "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": false
   }
 }
