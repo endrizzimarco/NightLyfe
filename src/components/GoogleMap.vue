@@ -43,7 +43,7 @@ export default {
     toggleHeatmap() {
       this.heatmap.setMap(this.heatmap.getMap() ? null : this.map)
     },
-    // Centers the map on user position when the button is presed
+    // Centers the map on user position when the button is pressed
     centerMap() {
       this.map.setCenter(new google.maps.LatLng(this.center.lat, this.center.lng))
       this.map.setZoom(15)
@@ -57,8 +57,9 @@ export default {
         navigator.geolocation.getCurrentPosition(resolve, reject, options)
       })
     },
-    // Set center variable to current estimated coordinates
+    // Save current estimated positio to the store and firebase db
     async geolocate() {
+      console.log('asd')
       if (navigator.geolocation) {
         try {
           const position = await this.getCurrentPosition()
@@ -115,7 +116,7 @@ export default {
         })
       return datesArray
     },
-    // Load crime data of past 3 months into crimes variable
+    // Load crime data of past 3 months into the 'crimes' variable
     async getCrimeData() {
       let dates = await this.fetchDates()
 
@@ -155,17 +156,18 @@ export default {
 
       // Wait for google Places API to be finished fetching relevant data
       await this.findPlaces()
-      // Initialize all relevant places on map
+      // Mark all relevant places on the map
       this.initPlaces()
 
-      // Initialize all relevant signals on the map
+      // Add all signals saved in the store on the map
       for (const i in this.signals) {
         let signal = this.signals[i]
         this.mapsAddSignal(signal)
       }
 
-      // Create a heatmap based on crimes location
+      // Wait for police.uk API to return crime data
       await this.getCrimeData()
+      // Create a heatmap based on crimes location
       this.crimes.forEach(crime => {
         const lat = crime.location.latitude
         const lng = crime.location.longitude
@@ -203,6 +205,7 @@ export default {
         })
       })
     },
+    // Code snippet to add a marker and info window on the map for a signal
     mapsAddSignal(signal) {
       var infoWindow = new google.maps.InfoWindow()
 
@@ -223,7 +226,7 @@ export default {
     /*********************
       GET PLACES DETAILS
     **********************/
-    // Return html element, either Open or closed
+    // Return a different html element based on whether an establishment is currently open or closed
     isPlaceOpen(place) {
       if (place.opening_hours) {
         let htmlElement = `<p class="text-negative">Closed</p>`
@@ -234,7 +237,7 @@ export default {
       }
       return ''
     },
-    // Return hmtl img element of first picture listed for establishment, if any
+    // Return hmtl img element of the first picture listed on maps for an establishment
     getPlaceImage(place) {
       if (place.photos) {
         const URL =
@@ -258,6 +261,7 @@ export default {
     /*********************
       GET SIGNAL ICON
     **********************/
+    // Returns the image source for every type of signal
     getSignalIcon(signalType) {
       switch (signalType) {
         case 'Danger':
@@ -281,8 +285,10 @@ export default {
   },
 
   watch: {
+    // Keep an eye on the signal object in the store
     signals: {
       deep: true,
+      // Whenever a new signal gets added, add it to the map
       handler() {
         let signal = this.signals[this.latestSignalKey]
         this.mapsAddSignal(signal)
@@ -291,12 +297,19 @@ export default {
   },
 
   async mounted() {
+    // Wait for current location to be fetched and saved to store
     await this.geolocate()
+    // Wait for map and map components to be loaded
     await this.initMap()
-
-    window.setInterval(() => {
+    // Geolocate user every 30 seconds if on Index page
+    this.interval = window.setInterval(() => {
       this.geolocate()
     }, 30000)
+  },
+
+  unmounted() {
+    // Stop geolocating user if not on Index page
+    window.clearInterval(this.interval)
   }
 }
 </script>
