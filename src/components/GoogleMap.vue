@@ -19,7 +19,7 @@ q-btn(
 </template> 
 
 <script>
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import axios from 'axios'
 
 export default {
@@ -28,7 +28,6 @@ export default {
   data() {
     return {
       toggle: false,
-      center: null,
       map: null,
       heatmap: null,
       places: [],
@@ -37,6 +36,9 @@ export default {
   },
 
   methods: {
+    /***********************
+      BUTTON CLICK HANDLERS
+    ************************/
     // Helper method to turn heatmap on/off
     toggleHeatmap() {
       this.heatmap.setMap(this.heatmap.getMap() ? null : this.map)
@@ -60,10 +62,11 @@ export default {
       if (navigator.geolocation) {
         try {
           const position = await this.getCurrentPosition()
-          this.center = {
+          let center = {
             lat: position.coords.latitude,
             lng: position.coords.longitude
           }
+          this.firebaseSavePosition(center)
         } catch (error) {
           console.error(error)
         }
@@ -268,17 +271,22 @@ export default {
         case 'Car Rental':
           return 'https://img.icons8.com/color/50/000000/car-rental.png'
       }
-    }
+    },
+    ...mapActions('firebase', ['firebaseSavePosition'])
   },
 
   computed: {
     ...mapState(['mapStyles']),
-    ...mapState('firebase', ['signals'])
+    ...mapState('firebase', ['center', 'signals'])
   },
 
   async mounted() {
     await this.geolocate()
     await this.initMap()
+
+    window.setInterval(() => {
+      this.geolocate()
+    }, 30000)
   }
 }
 </script>
