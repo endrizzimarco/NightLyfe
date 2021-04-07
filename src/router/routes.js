@@ -19,6 +19,7 @@ const routes = [
   { path: '/settings', component: () => import( 'pages/Settings.vue')},
   { path: '/privacy', component: () => import( 'pages/Privacy.vue')},
   { path: '/contactus', component: () => import( 'pages/ContactUs.vue')},
+  { path: '/sendfeedback', component: () => import( 'pages/Feedback.vue')},
   // Always leave this as last one,
   // but you can also remove it
   {
