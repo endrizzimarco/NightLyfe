@@ -1,5 +1,5 @@
 <template lang="pug">
-q-page.q-pa-lg.column.justify-end.page-chat(ref='pageChat')
+q-page.q-pa-lg.q-mb-xl.column.justify-end.page-chat(ref='pageChat')
   q-chat-message.text-weight-light(
     v-for='(message, key) in messages',
     :key='key',
@@ -11,19 +11,18 @@ q-page.q-pa-lg.column.justify-end.page-chat(ref='pageChat')
     avatar='https://cdn.quasar.dev/img/avatar1.jpg'
   )
 q-footer(elevated)
-  q-toolbar
-    q-form.full-width(@submit='sendMessage')
-      .row
-        q-input.col-11(
-          v-model='newMessage',
-          ref='newMessage',
-          bg-color='white',
-          outlined,
-          rounded,
-          label='Message',
-          dense
-        )
-        q-btn.col-1(type='submit', icon='send', color='white', round, dense, flat)
+  .fixed-bottom.q-pa-xs.bg-primary.q-px-sm
+    q-form.full-width.row(@submit='sendMessage')
+      q-input.col-11(
+        v-model='newMessage',
+        ref='newMessage',
+        bg-color='white',
+        outlined,
+        rounded,
+        label='Message',
+        dense
+      )
+      q-btn.col-1(type='submit', icon='send', color='white', round, dense, flat)
 </template>
 
 <script>
@@ -58,7 +57,6 @@ export default {
         otherUserId: this.$route.params.otherUserId
       })
       this.clearMessage()
-      this.scrollToBottom()
     },
 
     clearMessage() {
@@ -80,11 +78,17 @@ export default {
     ...mapState('firebase', ['messages', 'userDetails'])
   },
 
+  watch: {
+    messages: {
+      deep: true,
+      handler() {
+        this.scrollToBottom()
+      }
+    }
+  },
+
   mounted() {
     this.firebaseGetMessages(this.$route.params.otherUserId)
-    setTimeout(() => {
-      this.scrollToBottom()
-    }, 150)
   },
 
   // Fire when the user leaves the page
