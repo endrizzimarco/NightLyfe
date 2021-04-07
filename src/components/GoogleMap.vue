@@ -39,27 +39,29 @@ export default {
     /***********************
       BUTTON CLICK HANDLERS
     ************************/
-    // Helper method to turn heatmap on/off
+    /* Helper method to turn heatmap on/off */
     toggleHeatmap() {
       this.heatmap.setMap(this.heatmap.getMap() ? null : this.map)
     },
-    // Centers the map on user position when the button is pressed
+
+    /* Centers the map on user position when the button is pressed */
     centerMap() {
       this.map.setCenter(new google.maps.LatLng(this.center.lat, this.center.lng))
       this.map.setZoom(15)
     },
+
     /*********************
-      APIs IMPLEMENTATION
+        GEOLOCATE API
     **********************/
-    // Fetch current position using MDN Geolocation API
+    /* Fetch current position using MDN Geolocation API */
     getCurrentPosition(options = {}) {
       return new Promise((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, options)
       })
     },
-    // Save current estimated positio to the store and firebase db
+
+    /* Save current estimated position to the store and firebase's db */
     async geolocate() {
-      console.log('asd')
       if (navigator.geolocation) {
         try {
           const position = await this.getCurrentPosition()
@@ -75,7 +77,11 @@ export default {
         alert('Geolocation is not supported by this browser.')
       }
     },
-    // Finds 20 places related to keyword 'nightlife' in 1500m proximity of center coordinates
+
+    /*********************
+          PLACES API
+    **********************/
+    /* Finds 20 places related to keyword 'nightlife' in 1500m proximity of center coordinates */
     async findPlaces() {
       const URL = `https://secret-ocean-49799.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${this.center.lat},${this.center.lng}
                     &radius=1500
@@ -90,7 +96,46 @@ export default {
           console.log(error.message)
         })
     },
-    // Return an array containing the dates of last 3 months since the uk.police API was updated
+
+    /* Return hmtl img element of the first picture listed on maps for an establishment */
+    getPlaceImage(place) {
+      if (place.photos) {
+        const URL =
+          `https://secret-ocean-49799.herokuapp.com/https://maps.googleapis.com/maps/api/place/photo?maxwidth=120&key=AIzaSyBPUdoB3wV6A9L-H1-J5POiQRmgqqcL9Bk&photoreference=` +
+          place.photos[0].photo_reference
+        return `<img src="${URL}" height="80" width="60">`
+      }
+      return ''
+    },
+
+    /* Return specific icon based on first element of 'types' attribute for an establishment */
+    getPlaceIcon(place) {
+      let icon = 'https://img.icons8.com/color/40/000000/disco-ball.png'
+
+      if (place.types[0] == 'bar') {
+        icon = 'https://img.icons8.com/color/40/000000/beer.png'
+      } else if (place.types[0] == 'restaurant') {
+        icon = 'https://img.icons8.com/color/40/000000/food-and-wine.png'
+      }
+      return icon
+    },
+
+    /* Return a different html element based on whether an establishment is currently open or closed */
+    isPlaceOpen(place) {
+      if (place.opening_hours) {
+        let htmlElement = `<p class="text-negative">Closed</p>`
+        if (place.opening_hours.open_now) {
+          htmlElement = `<p class="text-positive">Open</p>`
+        }
+        return htmlElement
+      }
+      return ''
+    },
+
+    /*********************
+          CRIMES API 
+    **********************/
+    /* Return an array containing the dates of last 3 months since the uk.police API was updated */
     async fetchDates() {
       var datesArray = []
       const lastUpdateURL = `https://data.police.uk/api/crime-last-updated`
@@ -116,7 +161,8 @@ export default {
         })
       return datesArray
     },
-    // Load crime data of past 3 months into the 'crimes' variable
+
+    /* Load crime data of past 3 months into the 'crimes' variable */
     async getCrimeData() {
       let dates = await this.fetchDates()
 
@@ -133,7 +179,11 @@ export default {
           })
       }
     },
-    // Initialize stylized map, nightlife places markers and crime heatmap
+
+    /*********************
+        GOOGLE MAPS API
+    **********************/
+    /* Initialize stylized map, nightlife places markers and crime heatmap */
     async initMap() {
       var heatmapData = []
       // Initialize the map instance, load the styles from the vuex store
@@ -157,7 +207,7 @@ export default {
       // Wait for google Places API to be finished fetching relevant data
       await this.findPlaces()
       // Mark all relevant places on the map
-      this.initPlaces()
+      this.mapsInitPlaces()
 
       // Add all signals saved in the store on the map
       for (const i in this.signals) {
@@ -181,8 +231,9 @@ export default {
       heatmap.set('radius', heatmap.get('radius') ? null : 80)
       heatmap.set('opacity', heatmap.get('opacity') ? null : 0.3)
     },
-    // Creates markers and infoWindows for every relevant nightlife establishment in the area
-    initPlaces() {
+
+    /* Creates markers and infoWindows for every relevant nightlife establishment in the area */
+    mapsInitPlaces() {
       var infoWindow = new google.maps.InfoWindow()
 
       this.places.forEach(place => {
@@ -205,7 +256,8 @@ export default {
         })
       })
     },
-    // Code snippet to add a marker and info window on the map for a signal
+
+    /* Code snippet to add a marker and info window on the map for a signal */
     mapsAddSignal(signal) {
       var infoWindow = new google.maps.InfoWindow()
 
@@ -223,45 +275,8 @@ export default {
         infoWindow.open(this.map, marker)
       })
     },
-    /*********************
-      GET PLACES DETAILS
-    **********************/
-    // Return a different html element based on whether an establishment is currently open or closed
-    isPlaceOpen(place) {
-      if (place.opening_hours) {
-        let htmlElement = `<p class="text-negative">Closed</p>`
-        if (place.opening_hours.open_now) {
-          htmlElement = `<p class="text-positive">Open</p>`
-        }
-        return htmlElement
-      }
-      return ''
-    },
-    // Return hmtl img element of the first picture listed on maps for an establishment
-    getPlaceImage(place) {
-      if (place.photos) {
-        const URL =
-          `https://secret-ocean-49799.herokuapp.com/https://maps.googleapis.com/maps/api/place/photo?maxwidth=120&key=AIzaSyBPUdoB3wV6A9L-H1-J5POiQRmgqqcL9Bk&photoreference=` +
-          place.photos[0].photo_reference
-        return `<img src="${URL}" height="80" width="60">`
-      }
-      return ''
-    },
-    // Return specific icon based on first element of 'types' attribute for an establishment
-    getPlaceIcon(place) {
-      let icon = 'https://img.icons8.com/color/40/000000/disco-ball.png'
 
-      if (place.types[0] == 'bar') {
-        icon = 'https://img.icons8.com/color/40/000000/beer.png'
-      } else if (place.types[0] == 'restaurant') {
-        icon = 'https://img.icons8.com/color/40/000000/food-and-wine.png'
-      }
-      return icon
-    },
-    /*********************
-      GET SIGNAL ICON
-    **********************/
-    // Returns the image source for every type of signal
+    /* Returns the image source for every type of signal */
     getSignalIcon(signalType) {
       switch (signalType) {
         case 'Danger':
