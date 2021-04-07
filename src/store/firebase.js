@@ -8,7 +8,8 @@ const state = {
   messages: {},
   friends: {},
   pending: {},
-  signals: {1: {lat: 51.234100, lng: -0.570409, details: 'WAOW', type: 'Fight Breakout'}}
+  signals: {},
+  latestSignalKey: null
 }
 
 const mutations = {
@@ -47,7 +48,9 @@ const mutations = {
   },
   // Adds a signal in 'signals' object
   addSignal(state, payload) {
-    state.signals[payload.signalId] = payload.signalDetails
+    let signalId = Object.keys(payload)[0]
+    state.signals[signalId] = payload[signalId]    
+    state.latestSignalKey = signalId
   }
 }
 
@@ -101,6 +104,7 @@ const actions = {
           })
         })
         dispatch('firebaseGetFriends', userId)
+        dispatch('firebaseGetSignals')
         
         // Handle online status
         firebaseDb.ref('.info/connected').on('value', (snap) => {
@@ -202,7 +206,25 @@ const actions = {
   },
 
   firebaseSendSignal({ state, commit }, payload) {
+    let signal = payload
+    signal['lat'] = state.center.lat
+    signal['lng'] = state.center.lng
 
+    let signalRef = firebaseDb.ref('signals/').push(signal)
+
+    let newSignal = {}
+    newSignal[signalRef.key] =  signal
+
+    commit('addSignal', newSignal)
+  },
+
+  firebaseGetSignals({ commit }) {
+    firebaseDb.ref('signals/').on('child_added', snapshot => {
+      let signal = {}
+      signal[snapshot.key] = snapshot.val()
+      commit('addSignal', signal)
+      })
+    
   },
 
   firebaseSavePosition({ state, commit }, payload) {
