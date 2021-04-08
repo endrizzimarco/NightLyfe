@@ -52,25 +52,28 @@ q-card.full-width
       q-select.full-width(
         v-model='location',
         @input-value='setUserInput',
-        :options='searchResults',
+        :options='placesOptions',
         :dense='true',
         label='Search places',
         rounded,
         outlined,
         use-input,
         input-debounce='0',
-        hide-selected,
-        fill-input
+        emit-value,
+        map-options
       )
         template(v-slot:prepend)
           q-icon(name='place')
+        template(v-slot:no-option)
+          q-item
+            q-item-section.text-grey No results
     //- Invite friends field
     .row.q-pb-md
       span.text-subtitle1.text-blue-grey-10 Invite your friends:
       q-select.full-width(
         v-model='eventData.friends',
         :dense='true',
-        :options='this.options',
+        :options='friendsOptions',
         label='Select friends',
         rounded,
         outlined,
@@ -105,6 +108,7 @@ q-card.full-width
 
 <script>
 import { mapState, mapActions } from 'vuex'
+import axios from 'axios'
 
 export default {
   data() {
@@ -125,20 +129,48 @@ export default {
   },
 
   methods: {
-    displaySuggestions(predictions, status) {
+    async submitEvent() {
+      // Turn place name into coordinates to save in db
+      await this.geocodeLocation()
+      // Need to turn array into object before saving to db
+      this.eventData['friends'] = this.friendsObject
+      // Save eventData object under events node in db
+      this.firebaseSubmitEvent(this.eventData)
+    },
+
+    placesGetPredictions() {
+      this.service.getPlacePredictions(
+        {
+          input: this.userInput,
+          location: new google.maps.LatLng(this.center),
+          radius: 5000
+        },
+        this.savePredictions
+      )
+    },
+
+    savePredictions(predictions, status) {
       if (status !== window.google.maps.places.PlacesServiceStatus.OK) {
         this.searchResults = []
         return
       }
-      this.searchResults = predictions.map(prediction => prediction.description)
+      this.searchResults = predictions
     },
 
-    setUserInput(val) {
-      this.userInput = val
-    },
+    async geocodeLocation() {
+      const URL = `https://secret-ocean-49799.herokuapp.com/https://maps.googleapis.com/maps/api/place/details/json?place_id=${this.location}&fields=geometry&key=AIzaSyBPUdoB3wV6A9L-H1-J5POiQRmgqqcL9Bk`
 
-    submitEvent() {
-      console.log(this.eventData)
+      await axios
+        .get(URL)
+        .then(response => {
+          let placeLocation = response.data.result.geometry.location
+
+          this.eventData['lat'] = placeLocation.lat
+          this.eventData['lng'] = placeLocation.lng
+        })
+        .catch(error => {
+          console.log(error)
+        })
     },
 
     getEventIcon(eventType) {
@@ -158,21 +190,15 @@ export default {
       }
     },
 
-    placesGetPredictions() {
-      this.service.getPlacePredictions(
-        {
-          input: this.userInput,
-          location: new google.maps.LatLng(this.center),
-          radius: 5000
-        },
-        this.displaySuggestions
-      )
+    setUserInput(val) {
+      this.userInput = val
     },
+
     ...mapActions('firebase', ['firebaseSubmitEvent'])
   },
 
   computed: {
-    options() {
+    friendsOptions() {
       var optionsArray = []
 
       for (const key in this.friends) {
@@ -184,6 +210,32 @@ export default {
       }
       return optionsArray
     },
+
+    placesOptions() {
+      var optionsArray = []
+
+      for (const key in this.searchResults) {
+        let result = this.searchResults[key]
+
+        let optionObject = {
+          label: result.description,
+          value: result.place_id
+        }
+        optionsArray.push(optionObject)
+      }
+      return optionsArray
+    },
+
+    friendsObject() {
+      let friendsObj = {}
+
+      this.eventData.friends.forEach(friendKey => {
+        friendsObj[friendKey] = true
+      })
+
+      return friendsObj
+    },
+
     ...mapState('firebase', ['friends', 'center'])
   },
 
