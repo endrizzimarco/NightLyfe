@@ -31,7 +31,8 @@ export default {
       map: null,
       heatmap: null,
       places: [],
-      crimes: []
+      crimes: [],
+      dataFetched: false
     }
   },
 
@@ -200,26 +201,13 @@ export default {
         map: map
       })
 
-      // Save heatmap and map instance for use in toggleHeatmap()
-      this.heatmap = heatmap
+      // Save map instance for global access in other methods
       this.map = map
 
       // Wait for google Places API to be finished fetching relevant data
       await this.findPlaces()
       // Mark all relevant places on the map
       this.mapsInitPlaces()
-
-      // Add all signals saved in the store on the map
-      for (const i in this.signals) {
-        let signal = this.signals[i]
-        this.mapsAddSignal(signal)
-      }
-
-      // Add all event saved in the store on the map
-      for (const i in this.events) {
-        let event = this.events[i]
-        this.mapsAddEvent(event)
-      }
 
       // Wait for police.uk API to return crime data
       await this.getCrimeData()
@@ -236,6 +224,23 @@ export default {
       })
       heatmap.set('radius', heatmap.get('radius') ? null : 80)
       heatmap.set('opacity', heatmap.get('opacity') ? null : 0.3)
+
+      // Save heatmap reference for user in toggleHeatmap()
+      this.heatmap = heatmap
+
+      // Add all signals saved in the store on the map
+      for (const i in this.signals) {
+        let signal = this.signals[i]
+        this.mapsAddSignal(signal)
+      }
+
+      // Add all event saved in the store on the map
+      for (const i in this.events) {
+        let event = this.events[i]
+        this.mapsAddEvent(event)
+      }
+
+      this.dataFetched = true
     },
 
     /* Creates markers and infoWindows for every relevant nightlife establishment in the area */
@@ -349,16 +354,22 @@ export default {
       deep: true,
       // Whenever a new signal gets added, add it to the map
       handler() {
-        let signal = this.signals[this.latestSignalKey]
-        this.mapsAddSignal(signal)
+        // If db signals have been fetched start tracking new events
+        if (this.dataFetched === true) {
+          let signal = this.signals[this.latestSignalKey]
+          this.mapsAddSignal(signal)
+        }
       }
     },
     events: {
       deep: true,
       // Whenever a new event gets added, add it to the map
       handler() {
-        let event = this.events[this.latestEventKey]
-        this.mapsAddEvent(event)
+        // If db events have been fetched start tracking new events
+        if (this.dataFetched === true) {
+          let event = this.events[this.latestEventKey]
+          this.mapsAddEvent(event)
+        }
       }
     }
   },
