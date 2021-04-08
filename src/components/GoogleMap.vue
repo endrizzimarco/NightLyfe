@@ -31,7 +31,8 @@ export default {
       map: null,
       heatmap: null,
       places: [],
-      crimes: []
+      crimes: [],
+      dataFetched: false
     }
   },
 
@@ -200,20 +201,13 @@ export default {
         map: map
       })
 
-      // Save heatmap and map instance for use in toggleHeatmap()
-      this.heatmap = heatmap
+      // Save map instance for global access in other methods
       this.map = map
 
       // Wait for google Places API to be finished fetching relevant data
       await this.findPlaces()
       // Mark all relevant places on the map
       this.mapsInitPlaces()
-
-      // Add all signals saved in the store on the map
-      for (const i in this.signals) {
-        let signal = this.signals[i]
-        this.mapsAddSignal(signal)
-      }
 
       // Wait for police.uk API to return crime data
       await this.getCrimeData()
@@ -230,6 +224,23 @@ export default {
       })
       heatmap.set('radius', heatmap.get('radius') ? null : 80)
       heatmap.set('opacity', heatmap.get('opacity') ? null : 0.3)
+
+      // Save heatmap reference for user in toggleHeatmap()
+      this.heatmap = heatmap
+
+      // Add all signals saved in the store on the map
+      for (const i in this.signals) {
+        let signal = this.signals[i]
+        this.mapsAddSignal(signal)
+      }
+
+      // Add all event saved in the store on the map
+      for (const i in this.events) {
+        let event = this.events[i]
+        this.mapsAddEvent(event)
+      }
+
+      this.dataFetched = true
     },
 
     /* Creates markers and infoWindows for every relevant nightlife establishment in the area */
@@ -291,12 +302,50 @@ export default {
           return 'https://img.icons8.com/color/50/000000/car-rental.png'
       }
     },
+
+    /* Code snippet to add a marker and info window on the map for an event */
+    mapsAddEvent(event) {
+      var infoWindow = new google.maps.InfoWindow()
+
+      let marker = new google.maps.Marker({
+        position: new google.maps.LatLng(event.lat, event.lng),
+        map: this.map,
+        icon: this.getEventIcon(event.type)
+      })
+
+      google.maps.event.addListener(marker, 'click', () => {
+        infoWindow.setContent(
+          `<p class="text-subtitle1" style="margin-bottom:8px;">${event.name} (${event.date} ${event.time}) </p>
+            <p class="text-weight-light">${event.details}</p>`
+        )
+        infoWindow.open(this.map, marker)
+      })
+    },
+
+    /* Returns the image source for every type of event */
+    getEventIcon(eventType) {
+      switch (eventType) {
+        case 'Home':
+          return 'https://img.icons8.com/dusk/50/000000/home.png'
+        case 'Baloons':
+          return 'https://img.icons8.com/dusk/50/000000/party-baloons.png'
+        case 'Dancing':
+          return 'https://img.icons8.com/dusk/50/000000/dancing-party.png'
+        case 'Champagne':
+          return 'https://img.icons8.com/dusk/50/000000/champagne.png'
+        case 'Dj':
+          return 'https://img.icons8.com/dusk/50/000000/dj.png'
+        case 'Gift':
+          return 'https://img.icons8.com/dusk/50/000000/gift.png'
+      }
+    },
+
     ...mapActions('firebase', ['firebaseSavePosition'])
   },
 
   computed: {
     ...mapState(['mapStyles']),
-    ...mapState('firebase', ['center', 'signals', 'latestSignalKey'])
+    ...mapState('firebase', ['center', 'signals', 'latestSignalKey', 'events', 'latestEventKey'])
   },
 
   watch: {
@@ -305,8 +354,22 @@ export default {
       deep: true,
       // Whenever a new signal gets added, add it to the map
       handler() {
-        let signal = this.signals[this.latestSignalKey]
-        this.mapsAddSignal(signal)
+        // If db signals have been fetched start tracking new events
+        if (this.dataFetched === true) {
+          let signal = this.signals[this.latestSignalKey]
+          this.mapsAddSignal(signal)
+        }
+      }
+    },
+    events: {
+      deep: true,
+      // Whenever a new event gets added, add it to the map
+      handler() {
+        // If db events have been fetched start tracking new events
+        if (this.dataFetched === true) {
+          let event = this.events[this.latestEventKey]
+          this.mapsAddEvent(event)
+        }
       }
     }
   },

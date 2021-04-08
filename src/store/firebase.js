@@ -9,7 +9,9 @@ const state = {
   friends: {},
   pending: {},
   signals: {},
-  latestSignalKey: null
+  latestSignalKey: null,
+  events: {},
+  latestEventKey: null
 }
 
 const mutations = {
@@ -59,6 +61,13 @@ const mutations = {
     let signalId = Object.keys(payload)[0]
     state.signals[signalId] = payload[signalId]    
     state.latestSignalKey = signalId
+  },
+
+  // Adds an event in 'events' object
+  addEvent(state, payload) {
+    let eventId = Object.keys(payload)[0]
+    state.events[eventId] = payload[eventId]    
+    state.latestEventKey = eventId
   }
 }
 
@@ -124,6 +133,8 @@ const actions = {
         dispatch('firebaseGetFriends', userId)
         // Get all signals in db and save them in the store
         dispatch('firebaseGetSignals')
+        // Get all signals in db and save them in the store
+        dispatch('firebaseGetEvents')
         
         // Handle online status
         firebaseDb.ref('.info/connected').on('value', (snap) => {
@@ -241,7 +252,7 @@ const actions = {
       })
   },
 
-  /* Add signal under signals node in firebase's sb */
+  /* Add signal under signals node in firebase's db */
   firebaseSendSignal({ state, commit }, payload) {
     let signal = payload
     signal['lat'] = state.center.lat
@@ -256,6 +267,30 @@ const actions = {
     commit('addSignal', newSignal)
   },
 
+  /***********************
+          EVENTS
+  ************************/
+  /* Fetch from db all events and save them to the store while adding
+   a listener to automatically add new recorded events */
+  firebaseGetEvents({ commit }) {
+    firebaseDb.ref('events/').on('child_added', snapshot => {
+      let event = {}
+      event[snapshot.key] = snapshot.val()
+      commit('addEvent', event)
+      })
+  },
+
+  /* Add an event under events node in firebase's db */
+  firebaseSubmitEvent({ commit }, payload) {
+    let event = payload
+    // Add event to db
+    let eventRef = firebaseDb.ref('events/').push(event)
+
+    let newEvent = {}
+    newEvent[eventRef.key] =  event // {eventKey: eventContent}
+    // Add event to the store's 'event' object
+    commit('addEvent', newEvent)
+  },
   /***********************
           POSITION
   ************************/

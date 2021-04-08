@@ -1,6 +1,6 @@
 <template lang="pug">
 q-card.full-width
-  //- Create Event Header
+  //- 'Create Event' Header
   q-card-section.bg-blue-grey-1(style='padding: 8px')
     span.text-subtitle1.text-weight-light.text-blue-grey-10.q-ml-sm Create your event
     q-chip.float-right(
@@ -11,12 +11,12 @@ q-card.full-width
       icon='done',
       style='margin-top: -1px'
     ) Submit Event
-  //- Create Event Form
+  //- 'Create Event' Form
   q-card-section
     //- Event name field
     .row.q-pb-md
       q-input.full-width(
-        v-model='name',
+        v-model='eventData.name',
         rounded,
         outlined,
         :dense='true',
@@ -28,9 +28,17 @@ q-card.full-width
     //- Date and Time field
     span.text-subtitle1.text-blue-grey-10.q-pt-sm Date and Time:
     .row.q-pb-md.no-wrap
-      q-input(v-model='date', rounded, outlined, type='date', :dense='true', hint='Date of Event', style='width: 60%')
+      q-input(
+        v-model='eventData.date',
+        rounded,
+        outlined,
+        type='date',
+        :dense='true',
+        hint='Date of Event',
+        style='width: 60%'
+      )
       q-input.q-ml-sm(
-        v-model='time',
+        v-model='eventData.time',
         rounded,
         outlined,
         type='time',
@@ -41,63 +49,207 @@ q-card.full-width
     //- Location of Event field
     .row.q-pb-md
       span.text-subtitle1.text-blue-grey-10 Where?:
-      q-input.full-width(rounded, outlined, v-model='places', label='Search places', :dense='true')
+      q-select.full-width(
+        v-model='location',
+        @input-value='setUserInput',
+        :options='placesOptions',
+        :dense='true',
+        label='Search places',
+        rounded,
+        outlined,
+        use-input,
+        input-debounce='0',
+        emit-value,
+        map-options
+      )
         template(v-slot:prepend)
           q-icon(name='place')
-        template(v-slot:append)
-          q-icon.cursor-pointer(name='search', @click='searchPlaces()')
+        template(v-slot:no-option)
+          q-item
+            q-item-section.text-grey No results
     //- Invite friends field
     .row.q-pb-md
       span.text-subtitle1.text-blue-grey-10 Invite your friends:
-      q-input.full-width(rounded, outlined, v-model='friends', label='Search friends', :dense='true')
+      q-select.full-width(
+        v-model='eventData.friends',
+        :dense='true',
+        :options='friendsOptions',
+        label='Select friends',
+        rounded,
+        outlined,
+        multiple,
+        use-chips,
+        emit-value,
+        map-options
+      )
         template(v-slot:prepend)
           q-icon(name='person_add')
-        template(v-slot:append)
-          q-icon.cursor-pointer(name='search', @click='searchFriends()')
-    //- Event icon field
+    //- Event choose icon field
     .text-subtitle1.text-blue-grey-10 Choose an icon for your Event:
     .row.q-pb-md.justify-around
-      img(src='https://img.icons8.com/dusk/50/000000/home.png')
-      img(src='https://img.icons8.com/dusk/50/000000/party-baloons.png')
-      img(src='https://img.icons8.com/dusk/50/000000/dancing-party.png')
-      img(src='https://img.icons8.com/dusk/50/000000/champagne.png')
-      img(src='https://img.icons8.com/dusk/50/000000/dj.png')
-      img(src='https://img.icons8.com/dusk/50/000000/gift.png')
-    //- Event details field
+      img.cursor-pointer.q-pa-xs(
+        v-for='eventType in ["Home", "Baloons", "Dancing", "Champagne", "Dj", "Gift"]',
+        @click='eventData.type = eventType',
+        :src='getEventIcon(eventType)',
+        :style='eventData.type == eventType ? "box-shadow: 0 0 1pt 2pt #03c6fc; border-radius: 30%" : ""'
+      )
+    //- Event insert details field
     .row
       span.text-subtitle1.text-blue-grey-10 Details:
       q-input.full-width(
         rounded,
         outlined,
         autogrow,
-        v-model='details',
+        v-model='eventData.details',
         placeholder='Dress code, specifications, directions etc.',
         :dense='true'
       )
 </template>
 
 <script>
+import { mapState, mapActions } from 'vuex'
+import axios from 'axios'
+
 export default {
   data() {
     return {
-      name: null,
-      date: null,
-      time: null,
-      places: null,
-      friends: null,
-      details: null
+      eventData: {
+        name: '',
+        date: null,
+        time: null,
+        friends: [],
+        type: '',
+        details: ''
+      },
+      location: '',
+      userInput: 'a',
+      service: null,
+      searchResults: []
     }
   },
+
   methods: {
-    searchPlaces() {
-      console.log('searching places')
+    async submitEvent() {
+      // Turn place name into coordinates to save in db
+      await this.geocodeLocation()
+      // Need to turn array into object before saving to db
+      this.eventData['friends'] = this.friendsObject
+      // Save eventData object under events node in db
+      this.firebaseSubmitEvent(this.eventData)
     },
-    searchFriends() {
-      console.log('searching friends')
+
+    placesGetPredictions() {
+      this.service.getPlacePredictions(
+        {
+          input: this.userInput,
+          location: new google.maps.LatLng(this.center),
+          radius: 5000
+        },
+        this.savePredictions
+      )
     },
-    submitEvent() {
-      console.log('submit event')
+
+    savePredictions(predictions, status) {
+      if (status !== window.google.maps.places.PlacesServiceStatus.OK) {
+        this.searchResults = []
+        return
+      }
+      this.searchResults = predictions
+    },
+
+    async geocodeLocation() {
+      const URL = `https://secret-ocean-49799.herokuapp.com/https://maps.googleapis.com/maps/api/place/details/json?place_id=${this.location}&fields=geometry&key=AIzaSyBPUdoB3wV6A9L-H1-J5POiQRmgqqcL9Bk`
+
+      await axios
+        .get(URL)
+        .then(response => {
+          let placeLocation = response.data.result.geometry.location
+
+          this.eventData['lat'] = placeLocation.lat
+          this.eventData['lng'] = placeLocation.lng
+        })
+        .catch(error => {
+          console.log(error)
+        })
+    },
+
+    getEventIcon(eventType) {
+      switch (eventType) {
+        case 'Home':
+          return 'https://img.icons8.com/dusk/50/000000/home.png'
+        case 'Baloons':
+          return 'https://img.icons8.com/dusk/50/000000/party-baloons.png'
+        case 'Dancing':
+          return 'https://img.icons8.com/dusk/50/000000/dancing-party.png'
+        case 'Champagne':
+          return 'https://img.icons8.com/dusk/50/000000/champagne.png'
+        case 'Dj':
+          return 'https://img.icons8.com/dusk/50/000000/dj.png'
+        case 'Gift':
+          return 'https://img.icons8.com/dusk/50/000000/gift.png'
+      }
+    },
+
+    setUserInput(val) {
+      this.userInput = val
+    },
+
+    ...mapActions('firebase', ['firebaseSubmitEvent'])
+  },
+
+  computed: {
+    friendsOptions() {
+      var optionsArray = []
+
+      for (const key in this.friends) {
+        let optionObject = {
+          label: this.friends[key].name,
+          value: key
+        }
+        optionsArray.push(optionObject)
+      }
+      return optionsArray
+    },
+
+    placesOptions() {
+      var optionsArray = []
+
+      for (const key in this.searchResults) {
+        let result = this.searchResults[key]
+
+        let optionObject = {
+          label: result.description,
+          value: result.place_id
+        }
+        optionsArray.push(optionObject)
+      }
+      return optionsArray
+    },
+
+    friendsObject() {
+      let friendsObj = {}
+
+      this.eventData.friends.forEach(friendKey => {
+        friendsObj[friendKey] = true
+      })
+
+      return friendsObj
+    },
+
+    ...mapState('firebase', ['friends', 'center'])
+  },
+
+  watch: {
+    userInput(newValue) {
+      if (newValue) {
+        this.placesGetPredictions()
+      }
     }
+  },
+
+  mounted() {
+    this.service = new window.google.maps.places.AutocompleteService()
+    this.placesGetPredictions() // Default predict with letter 'a' as input
   }
 }
 </script>
