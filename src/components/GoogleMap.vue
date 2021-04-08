@@ -215,6 +215,12 @@ export default {
         this.mapsAddSignal(signal)
       }
 
+      // Add all event saved in the store on the map
+      for (const i in this.events) {
+        let event = this.events[i]
+        this.mapsAddEvent(event)
+      }
+
       // Wait for police.uk API to return crime data
       await this.getCrimeData()
       // Create a heatmap based on crimes location
@@ -291,12 +297,50 @@ export default {
           return 'https://img.icons8.com/color/50/000000/car-rental.png'
       }
     },
+
+    /* Code snippet to add a marker and info window on the map for an event */
+    mapsAddEvent(event) {
+      var infoWindow = new google.maps.InfoWindow()
+
+      let marker = new google.maps.Marker({
+        position: new google.maps.LatLng(event.lat, event.lng),
+        map: this.map,
+        icon: this.getEventIcon(event.type)
+      })
+
+      google.maps.event.addListener(marker, 'click', () => {
+        infoWindow.setContent(
+          `<p class="text-subtitle1" style="margin-bottom:8px;">${event.name} (${event.date} ${event.time}) </p>
+            <p class="text-weight-light">${event.details}</p>`
+        )
+        infoWindow.open(this.map, marker)
+      })
+    },
+
+    /* Returns the image source for every type of event */
+    getEventIcon(eventType) {
+      switch (eventType) {
+        case 'Home':
+          return 'https://img.icons8.com/dusk/50/000000/home.png'
+        case 'Baloons':
+          return 'https://img.icons8.com/dusk/50/000000/party-baloons.png'
+        case 'Dancing':
+          return 'https://img.icons8.com/dusk/50/000000/dancing-party.png'
+        case 'Champagne':
+          return 'https://img.icons8.com/dusk/50/000000/champagne.png'
+        case 'Dj':
+          return 'https://img.icons8.com/dusk/50/000000/dj.png'
+        case 'Gift':
+          return 'https://img.icons8.com/dusk/50/000000/gift.png'
+      }
+    },
+
     ...mapActions('firebase', ['firebaseSavePosition'])
   },
 
   computed: {
     ...mapState(['mapStyles']),
-    ...mapState('firebase', ['center', 'signals', 'latestSignalKey'])
+    ...mapState('firebase', ['center', 'signals', 'latestSignalKey', 'events', 'latestEventKey'])
   },
 
   watch: {
@@ -307,6 +351,14 @@ export default {
       handler() {
         let signal = this.signals[this.latestSignalKey]
         this.mapsAddSignal(signal)
+      }
+    },
+    events: {
+      deep: true,
+      // Whenever a new event gets added, add it to the map
+      handler() {
+        let event = this.events[this.latestEventKey]
+        this.mapsAddEvent(event)
       }
     }
   },
