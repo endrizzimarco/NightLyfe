@@ -6,13 +6,15 @@ let messagesRef
 const state = {
   userDetails: {}, // Current user info
   center: {}, // Current user coords
+  users: {}, // Current users in a 1.5km radius
   messages: {}, // Holds messages for a conversation
   friends: {}, // Current user's friends
   pending: {}, // Current user's pending friend request
   signals: {}, // Current signals in a 1.5km radius
   events: {}, // All events in a 10km radius
   latestSignalKey: null, // Key of last added signal
-  latestEventKey: null // Key of last added event
+  latestEventKey: null, // Key of last added event
+  latestUserChange: {userId: null, type: null} // Latest change to users object
 }
 
 const mutations = {
@@ -24,6 +26,23 @@ const mutations = {
    // Assigns center' value to current lat and long of user
   setUserCenter(state, payload) {
     state.center = payload
+  },
+
+  // Adds a user in 'users' object
+  addUser(state, payload) {
+    state.users[payload.userId] = payload.userDetails
+
+    state.latestUserChange.userId = payload.userId
+    state.latestUserChange.type = 'add'
+  },
+
+  // Removes a pending friend request from 'pending' object 
+  removeUser(state, payload) {
+    let userId = payload
+    delete state.users[userId]
+
+    state.latestUserChange.userId = userId
+    state.latestUserChange.type = 'remove'
   },
 
   // Adds a message in 'messages' object
@@ -41,7 +60,7 @@ const mutations = {
     state.friends[payload.userId] = payload.userDetails
   },
 
-  // Modify friends' online status as they go offline / get online
+  // Modify friends' online status as they go offline / online
   updateFriendStatus(state, payload) {
     state.friends[payload.userId].online = payload.online
   },
@@ -59,16 +78,14 @@ const mutations = {
 
   // Adds a signal in 'signals' object
   addSignal(state, payload) {
-    let signalId = Object.keys(payload)[0]
-    state.signals[signalId] = payload[signalId]    
-    state.latestSignalKey = signalId
+    state.signals[payload.signalId] = payload.signalDetails
+    state.latestSignalKey = payload.signalId
   },
 
   // Adds an event in 'events' object
   addEvent(state, payload) {
-    let eventId = Object.keys(payload)[0]
-    state.events[eventId] = payload[eventId]    
-    state.latestEventKey = eventId
+    state.events[payload.eventId] = payload.eventDetails  
+    state.latestEventKey = payload.eventId
   }
 }
 
@@ -136,6 +153,8 @@ const actions = {
         dispatch('firebaseGetSignals')
         // Get all signals in db and save them in the store
         dispatch('firebaseGetEvents')
+        // Get all users and save them in the store
+        dispatch('firebaseGetUsers')
         
         // Handle online status
         firebaseDb.ref('.info/connected').on('value', (snap) => {
@@ -163,28 +182,57 @@ const actions = {
       }
     })
   },
+  /***********************
+          USERS
+  ************************/
+  firebaseGetUsers({ state, commit }) {
+    firebaseDb.ref('status/').on('child_added', snapshot => {
+      var userKey = snapshot.key
+      firebaseDb.ref('status/' + userKey).on('value', snapshot => {
+        if (snapshot.val().online == false && userKey in state.users) {
+          commit('removeUser', userKey)
+        }
+        else if (snapshot.val().online == true) {
+          let currPos = state.center
+          let userPos = snapshot.val().position
+          let dist = getDistance(currPos.lat, currPos.lng, userPos.lat, userPos.lng)
+
+          if (dist < 1.5 && userKey != state.userDetails.userId) {
+            commit('addUser', {
+              userId: userKey,
+              userDetails: snapshot.val()
+            })
+          }
+          else if (userKey in state.users) {
+            commit('removeUser', userKey)
+          }
+        }
+      })
+    })
+  },
 
   /***********************
           FRIENDS
   ************************/
   /* Get all of the current user's friends and save them to the store, while adding
     a listener to automatically add to the store new entries were the database to change */
-  firebaseGetFriends({ commit, dispatch }, payload) {
-    let userId = payload
-    // Fetch current user from the db's friends node
-    firebaseDb.ref('friends/' + userId + '/friendList').on('child_added', snapshot => {
-      let otherUserId = snapshot.key
-      // For every friend, add details inside 'friends' store object
-      firebaseDb.ref('users').child(otherUserId).once('value', snapshot => {
-        let userDetails = snapshot.val()
-        commit('addFriend', {
-          userId: otherUserId, 
-          userDetails
+    firebaseGetFriends({ commit, dispatch }, payload) {
+      let userId = payload
+      // Fetch current user from the db's friends node
+      firebaseDb.ref('friends/' + userId + '/friendList').on('child_added', snapshot => {
+        let otherUserId = snapshot.key
+        // For every friend, add details inside 'friends' store object
+        firebaseDb.ref('users').child(otherUserId).once('value', snapshot => {
+          let userDetails = snapshot.val()
+          commit('addFriend', {
+            userId: otherUserId, 
+            userDetails
+          })
+          // Get the online status of every friend 
+          dispatch('firebaseTrackOnlineStatus', otherUserId)
         })
       })
-      // Get the online status of every friend 
-      dispatch('firebaseTrackOnlineStatus', otherUserId)
-    })
+    
     // Fetch all pending friend request and save them in the store
     firebaseDb.ref('friends/' + userId + '/pending').on('child_added', snapshot => {
       let otherUserId = snapshot.key
@@ -199,17 +247,18 @@ const actions = {
   },
 
   /* Updates firebase's db to reflect new pending friend request */
-  async firebaseSendFriendRequest({ state }, payload) {
+  firebaseSendFriendRequest({ state }, payload) {
     let otherUsername = payload 
     let requestObject = {}
     requestObject[state.userDetails.userId] = true // { userKey: true }
 
     // Wait for firebase to query db and return the other user's node
-    const snapshot = await firebaseDb.ref('users').orderByChild('username').equalTo(otherUsername).once('value')
-    // Get the other user's key
-    let otherUserId = Object.keys(snapshot.val())[0] 
-    // Add request objects inside pending property in db
-    firebaseDb.ref('friends/' + otherUserId + '/pending').update(requestObject)
+    firebaseDb.ref('users').orderByChild('username').equalTo(otherUsername).once('value', snapshot => {
+      // Get the other user's key
+      let otherUserId = Object.keys(snapshot.val())[0] 
+      // Add request objects inside pending property in db
+      firebaseDb.ref('friends/' + otherUserId + '/pending').update(requestObject)
+    })
   },
 
   /* Removes pending request and adds new friend to Realtime Database + local state */
@@ -251,9 +300,10 @@ const actions = {
       let dist = getDistance(currPos.lat, currPos.lng, snapshot.val().lat, snapshot.val().lng)
 
       if (dist < 1.5) {
-        let signal = {}
-        signal[snapshot.key] = snapshot.val()
-        commit('addSignal', signal)
+        commit('addSignal', {
+          signalId: snapshot.key,
+          signalDetails: snapshot.val()
+        })
       }
     })
   },
@@ -267,10 +317,11 @@ const actions = {
     // Add signal to db
     let signalRef = firebaseDb.ref('signals/').push(signal)
 
-    let newSignal = {}
-    newSignal[signalRef.key] =  signal // {signalKey: signalContent}
     // Add signal to the store's 'signal' object
-    commit('addSignal', newSignal)
+    commit('addSignal', {
+      signalId: signalRef.key,
+      signalDetails: signal
+    })
   },
 
   /***********************
@@ -284,9 +335,10 @@ const actions = {
       let dist = getDistance(currPos.lat, currPos.lng, snapshot.val().lat, snapshot.val().lng)
 
       if (dist < 10) {
-        let event = {}
-        event[snapshot.key] = snapshot.val()
-        commit('addEvent', event)
+        commit('addEvent', {
+          eventId: snapshot.key,
+          eventDetails: snapshot.val()
+        })
       }
     })
   },
@@ -297,10 +349,11 @@ const actions = {
     // Add event to db
     let eventRef = firebaseDb.ref('events/').push(event)
 
-    let newEvent = {}
-    newEvent[eventRef.key] =  event // {eventKey: eventContent}
     // Add event to the store's 'event' object
-    commit('addEvent', newEvent)
+    commit('addEvent', {
+      eventId: eventRef.key,
+      eventDetails: event
+    })
   },
   /***********************
           POSITION
@@ -361,11 +414,11 @@ const actions = {
   firebaseTrackOnlineStatus({ commit }, payload) {
     let userId = payload 
     // Change saved friend online status in store whenever the value in the db changes
-    firebaseDb.ref('status/' + userId).on('value', snapshot => {
+    firebaseDb.ref('status/' + userId).child('online').on('value', snapshot => {
       let status = snapshot.val()
       commit('updateFriendStatus', {
         userId: userId, 
-        online: status.online
+        online: status
       })
     })
   },
