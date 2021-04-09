@@ -32,6 +32,7 @@ export default {
       heatmap: null,
       places: [],
       crimes: [],
+      userMarkers: {},
       dataFetched: false
     }
   },
@@ -340,15 +341,52 @@ export default {
       }
     },
 
+    mapsAddUserMarker(userId) {
+      var userPosition = this.users[userId].position
+
+      let marker = new google.maps.Marker({
+        position: new google.maps.LatLng(userPosition.lat, userPosition.lng),
+        map: this.map,
+        icon: 'https://img.icons8.com/nolan/64/men-age-group-4--v2.png'
+      })
+      this.userMarkers[userId] = marker
+    },
+
+    mapsRemoveUserMarker(userId) {
+      this.userMarkers[userId].setMap(null)
+      delete this.userMarkers[userId]
+    },
+
     ...mapActions('firebase', ['firebaseSavePosition'])
   },
 
   computed: {
     ...mapState(['mapStyles']),
-    ...mapState('firebase', ['center', 'signals', 'latestSignalKey', 'events', 'latestEventKey'])
+    ...mapState('firebase', [
+      'center',
+      'users',
+      'latestUserChange',
+      'signals',
+      'latestSignalKey',
+      'events',
+      'latestEventKey'
+    ])
   },
 
   watch: {
+    latestUserChange: {
+      deep: true,
+      immediate: true,
+      // Whenever a new event gets added, add it to the map
+      handler() {
+        if (this.latestUserChange.type == 'add') {
+          this.mapsAddUserMarker(this.latestUserChange.userId)
+        } else if (this.latestUserChange.type == 'remove') {
+          this.mapsRemoveUserMarker(this.latestUserChange.userId)
+        }
+      }
+    },
+
     // Keep an eye on the signal object in the store
     signals: {
       deep: true,
@@ -361,6 +399,7 @@ export default {
         }
       }
     },
+
     events: {
       deep: true,
       // Whenever a new event gets added, add it to the map
