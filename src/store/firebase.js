@@ -1,17 +1,18 @@
 import { firebaseAuth, firebaseDb } from 'boot/firebase'
+import { getDistance } from './functions/getDistance';
 
 let messagesRef
 
 const state = {
-  userDetails: {},
-  center: {},
-  messages: {},
-  friends: {},
-  pending: {},
-  signals: {},
-  latestSignalKey: null,
-  events: {},
-  latestEventKey: null
+  userDetails: {}, // Current user info
+  center: {}, // Current user coords
+  messages: {}, // Holds messages for a conversation
+  friends: {}, // Current user's friends
+  pending: {}, // Current user's pending friend request
+  signals: {}, // Current signals in a 1.5km radius
+  events: {}, // All events in a 10km radius
+  latestSignalKey: null, // Key of last added signal
+  latestEventKey: null // Key of last added event
 }
 
 const mutations = {
@@ -244,12 +245,17 @@ const actions = {
   ************************/
   /* Fetch from db all signals and save them to the store and add
     a listener to automatically add new recorded signals */
-  firebaseGetSignals({ commit }) {
+  firebaseGetSignals({ state, commit }) {
     firebaseDb.ref('signals/').on('child_added', snapshot => {
-      let signal = {}
-      signal[snapshot.key] = snapshot.val()
-      commit('addSignal', signal)
-      })
+      let currPos = state.center 
+      let dist = getDistance(currPos.lat, currPos.lng, snapshot.val().lat, snapshot.val().lng)
+
+      if (dist < 1.5) {
+        let signal = {}
+        signal[snapshot.key] = snapshot.val()
+        commit('addSignal', signal)
+      }
+    })
   },
 
   /* Add signal under signals node in firebase's db */
@@ -272,12 +278,17 @@ const actions = {
   ************************/
   /* Fetch from db all events and save them to the store while adding
    a listener to automatically add new recorded events */
-  firebaseGetEvents({ commit }) {
+  firebaseGetEvents({ state, commit }) {
     firebaseDb.ref('events/').on('child_added', snapshot => {
-      let event = {}
-      event[snapshot.key] = snapshot.val()
-      commit('addEvent', event)
-      })
+      let currPos = state.center 
+      let dist = getDistance(currPos.lat, currPos.lng, snapshot.val().lat, snapshot.val().lng)
+
+      if (dist < 10) {
+        let event = {}
+        event[snapshot.key] = snapshot.val()
+        commit('addEvent', event)
+      }
+    })
   },
 
   /* Add an event under events node in firebase's db */
