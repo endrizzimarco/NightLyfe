@@ -154,24 +154,6 @@ export default {
             ]
         },
         {
-            "featureType": "poi",
-            "elementType": "labels.text",
-            "stylers": [
-                {
-                    "visibility": "on"
-                }
-            ]
-        },
-        {
-            "featureType": "poi",
-            "elementType": "labels.icon",
-            "stylers": [
-                {
-                    "visibility": "on"
-                }
-            ]
-        },
-        {
             "featureType": "poi.park",
             "elementType": "geometry.fill",
             "stylers": [
