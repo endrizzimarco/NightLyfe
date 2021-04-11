@@ -19,8 +19,9 @@ q-btn(
 </template> 
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, mapGetters } from 'vuex'
 import axios from 'axios'
+var userMarkers = {}
 
 export default {
   name: 'GoogleMap',
@@ -32,7 +33,6 @@ export default {
       heatmap: null,
       places: [],
       crimes: [],
-      userMarkers: {},
       dataFetched: false
     }
   },
@@ -344,17 +344,16 @@ export default {
     mapsAddUserMarker(userId) {
       var userPosition = this.users[userId].position
 
-      let marker = new google.maps.Marker({
+      userMarkers[userId] = new google.maps.Marker({
         position: new google.maps.LatLng(userPosition.lat, userPosition.lng),
         map: this.map,
         icon: 'https://img.icons8.com/nolan/64/men-age-group-4--v2.png'
       })
-      this.userMarkers[userId] = marker
     },
 
     mapsRemoveUserMarker(userId) {
-      this.userMarkers[userId].setMap(null)
-      delete this.userMarkers[userId]
+      userMarkers[userId].setMap(null)
+      delete userMarkers[userId]
     },
 
     ...mapActions('firebase', ['firebaseSavePosition'])
@@ -370,13 +369,13 @@ export default {
       'latestSignalKey',
       'events',
       'latestEventKey'
-    ])
+    ]),
+    ...mapGetters('firebase', ['latestUserChange'])
   },
 
   watch: {
     latestUserChange: {
       deep: true,
-      immediate: true,
       // Whenever a new event gets added, add it to the map
       handler() {
         if (this.latestUserChange.type == 'add') {
@@ -413,7 +412,7 @@ export default {
     }
   },
 
-  async mounted() {
+  async created() {
     // Wait for current location to be fetched and saved to store
     await this.geolocate()
     // Wait for map and map components to be loaded

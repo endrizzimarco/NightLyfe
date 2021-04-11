@@ -433,6 +433,9 @@ const getters = {
   // Return the property names for the userDetails object
   userDetailsKeys: state => {
     return Object.keys(state.userDetails)
+  },
+  latestUserChange: state => {
+    return state.latestUserChange
   }
 }
 
