@@ -10,8 +10,7 @@
   q-input.q-pb-md(v-model='localDetails.username', label='Username', stack-label, :readonly='isEditing')
   q-input.q-pb-md(v-model='localDetails.email', label='Email', stack-label, :readonly='isEditing')
     template(v-slot:append)
-      q-icon.cursor-pointer(name='event')
-        q-menu
+      q-menu
   q-input.q-pb-xl(v-model='localDetails.feedback', label='Feedback', stack-label='', autogrow='')
   div
     q-btn.float-right(@click='saveUserDetails()', icon='mail', color='green', label='Send Feedback')
