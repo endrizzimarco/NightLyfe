@@ -20,8 +20,10 @@ q-btn(
 
 <script>
 import { mapState, mapActions, mapGetters } from 'vuex'
+import { ref } from 'vue'
 import axios from 'axios'
-var userMarkers = {}
+
+var userMarkers = ref({})
 
 export default {
   name: 'GoogleMap',
