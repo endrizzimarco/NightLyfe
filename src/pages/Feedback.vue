@@ -14,7 +14,6 @@
         q-menu
   q-input.q-pb-xl(v-model='localDetails.feedback', label='Feedback', stack-label='', autogrow='')
   div
-    q-btn(@click='editing = !editing', color='blue', icon='mode_edit', label='Edit')
     q-btn.float-right(@click='saveUserDetails()', icon='mail', color='green', label='Send Feedback')
 </template>
 
