@@ -32,10 +32,10 @@ export default {
     return {
       toggle: false,
       map: null,
+      positionMarker: null,
       heatmap: null,
       places: [],
-      crimes: [],
-      dataFetched: false
+      crimes: []
     }
   },
 
@@ -199,7 +199,7 @@ export default {
       })
 
       // Initializes your position on the map
-      new google.maps.Marker({
+      this.positionMarker = new google.maps.Marker({
         position: new google.maps.LatLng(this.center.lat, this.center.lng),
         map: map
       })
@@ -242,8 +242,6 @@ export default {
         let event = this.events[i]
         this.mapsAddEvent(event)
       }
-
-      this.dataFetched = true
     },
 
     /* Creates markers and infoWindows for every relevant nightlife establishment in the area */
@@ -363,19 +361,17 @@ export default {
 
   computed: {
     ...mapState(['mapStyles']),
-    ...mapState('firebase', [
-      'center',
-      'users',
-      'latestUserChange',
-      'signals',
-      'latestSignalKey',
-      'events',
-      'latestEventKey'
-    ]),
-    ...mapGetters('firebase', ['latestUserChange'])
+    ...mapState('firebase', ['users', 'signals', 'events']),
+    ...mapGetters('firebase', ['center', 'latestUserChange', 'latestSignalKey', 'latestEventKey'])
   },
 
   watch: {
+    center(newValue) {
+      if (this.map) {
+        this.positionMarker.setPosition(newValue)
+      }
+    },
+
     latestUserChange: {
       deep: true,
       // Whenever a new event gets added, add it to the map
@@ -389,27 +385,23 @@ export default {
     },
 
     // Keep an eye on the signal object in the store
-    signals: {
+    latestSignalKey: {
       deep: true,
       // Whenever a new signal gets added, add it to the map
       handler() {
         // If db signals have been fetched start tracking new events
-        if (this.dataFetched === true) {
-          let signal = this.signals[this.latestSignalKey]
-          this.mapsAddSignal(signal)
-        }
+        let signal = this.signals[this.latestSignalKey]
+        this.mapsAddSignal(signal)
       }
     },
 
-    events: {
+    latestEventKey: {
       deep: true,
       // Whenever a new event gets added, add it to the map
       handler() {
         // If db events have been fetched start tracking new events
-        if (this.dataFetched === true) {
-          let event = this.events[this.latestEventKey]
-          this.mapsAddEvent(event)
-        }
+        let event = this.events[this.latestEventKey]
+        this.mapsAddEvent(event)
       }
     }
   },
@@ -419,10 +411,10 @@ export default {
     await this.geolocate()
     // Wait for map and map components to be loaded
     await this.initMap()
-    // Geolocate user every 30 seconds if on Index page
+    // Geolocate user every 10 seconds if on Index page
     this.interval = window.setInterval(() => {
       this.geolocate()
-    }, 30000)
+    }, 10000)
   },
 
   unmounted() {
