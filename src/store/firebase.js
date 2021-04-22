@@ -434,9 +434,19 @@ const getters = {
   userDetailsKeys: state => {
     return Object.keys(state.userDetails)
   },
+  center: state => {
+    return state.center
+  },
   latestUserChange: state => {
     return state.latestUserChange
-  }
+  },
+  latestSignalKey: state => {
+    return state.latestSignalChange
+  },
+  latestEventKey: state => {
+    return state.latestEventChange
+  },
+
 }
 
 export default {
