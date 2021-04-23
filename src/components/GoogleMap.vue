@@ -12,7 +12,7 @@ q-toggle(
 q-btn(
   @click='centerMap()',
   fab,
-  color='blue-grey-8',
+  color='grey-10',
   icon='my_location',
   style='position: absolute; right: 1.25em; bottom: 2.5em; z-index: 1'
 )
@@ -241,6 +241,11 @@ export default {
       for (const i in this.events) {
         let event = this.events[i]
         this.mapsAddEvent(event)
+      }
+
+      // Add all users saved in the store on the map
+      for (const userId in this.users) {
+        this.mapsAddUserMarker(userId)
       }
     },
 
