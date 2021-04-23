@@ -18,3 +18,9 @@ export default defineComponent({
   }
 })
 </script>
+
+<style>
+.bg-brand {
+  background: #135292;
+}
+</style>

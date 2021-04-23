@@ -12,7 +12,7 @@ q-toggle(
 q-btn(
   @click='centerMap()',
   fab,
-  color='black',
+  color='blue-grey-8',
   icon='my_location',
   style='position: absolute; right: 1.25em; bottom: 2.5em; z-index: 1'
 )

@@ -52,7 +52,7 @@ q-layout(view='lHh Lpr lFf')
     q-page-sticky(position='bottom-right', :offset='[18, 105]')
       q-btn(@click='rightDrawer = !rightDrawer', fab, color='primary', icon='chat')
     q-page-sticky(position='bottom', :offset='[18, 36]')
-      q-fab(vertical-actions-align='center', color='secondary', icon='add', direction='up')
+      q-fab(vertical-actions-align='center', color='teal-14', icon='add', direction='up')
         q-fab-action(@click='newEvent = true', color='orange', icon='add_location', label='New Event')
         q-fab-action(@click='newSignal = true', color='accent', icon='notification_add', label='New Signal')
 </template>

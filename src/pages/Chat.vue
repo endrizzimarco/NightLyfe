@@ -11,7 +11,7 @@ q-page.q-pa-lg.q-mb-xl.column.justify-end.page-chat(ref='pageChat')
     avatar='https://cdn.quasar.dev/img/avatar1.jpg'
   )
 q-footer(elevated)
-  .fixed-bottom.q-pa-xs.bg-primary.q-px-sm
+  .fixed-bottom.q-pa-xs.bg-brand.q-px-sm
     q-form.full-width.row(@submit='sendMessage')
       q-input.col-11(
         v-model='newMessage',
@@ -100,7 +100,7 @@ export default {
 
 <style lang='sass'>
 .page-chat
-  background: #e6fdff
+  background: #d5eaf7
   &:after
     content: ''
     display: block

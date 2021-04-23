@@ -1,7 +1,7 @@
 <template lang="pug">
 q-layout(view='lHh lpr lff')
   q-header(elevated)
-    q-toolbar
+    q-toolbar.bg-brand
       q-btn(
         v-if='$route.fullPath.includes("/chat")',
         @click='$router.go(-1)',
