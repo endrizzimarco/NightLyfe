@@ -13,7 +13,7 @@ export default defineComponent({
     ...mapActions('firebase', ['handleAuthStateChanged'])
   },
 
-  mounted() {
+  created() {
     this.handleAuthStateChanged()
   }
 })

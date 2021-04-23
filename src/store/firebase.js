@@ -384,7 +384,10 @@ const actions = {
   firebaseSavePosition({ state, commit }, payload) {
     let center = payload
     // Update position in the db
-    firebaseDb.ref('status/' + state.userDetails.userId).update({position: center})
+    if (state.userDetails.userId) {
+      firebaseDb.ref('status/' + state.userDetails.userId).update({position: center})
+    }
+
     // Update position in the store
     commit('setUserCenter', center)
   },

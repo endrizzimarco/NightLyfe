@@ -15,7 +15,7 @@ q-btn(
   color='grey-10',
   icon='my_location',
   style='position: absolute; right: 1.25em; bottom: 2.5em; z-index: 1'
-)
+) 
 </template> 
 
 <script>
@@ -247,6 +247,9 @@ export default {
       for (const userId in this.users) {
         this.mapsAddUserMarker(userId)
       }
+
+      // Reinitialize user on the map
+      this.geolocate()
     },
 
     /* Creates markers and infoWindows for every relevant nightlife establishment in the area */
