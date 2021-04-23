@@ -466,10 +466,10 @@ const getters = {
     return state.latestUserChange
   },
   latestSignalKey: state => {
-    return state.latestSignalChange
+    return state.latestSignalKey
   },
   latestEventKey: state => {
-    return state.latestEventChange
+    return state.latestEventKey
   },
 
 }
