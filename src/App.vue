@@ -21,6 +21,6 @@ export default defineComponent({
 
 <style>
 .bg-brand {
-  background: #135292;
+  background: #1b65af;
 }
 </style>
