@@ -5,7 +5,7 @@ q-layout.shadow-2.rounded-borders(view='lHh Lpr lff')
       style='background: linear-gradient(129deg, rgba(106, 98, 255, 1) 0%, rgba(0, 212, 255, 1) 100%)'
     )
       q-card.full-width(style='max-width: 1024px')
-        q-card-section.row.bg-primary.justify-center
+        q-card-section.row.bg-brand.justify-center
           h4.text-h4.text-white.q-my-lg.text-weight-light Welcome to NightLyfe
         q-tabs.text-grey(v-model='tab', active-color='primary', indicator-color='primary', align='justify')
           q-tab(name='login', label='Login')
