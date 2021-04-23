@@ -1,10 +1,10 @@
 <template lang="pug">
-q-toolbar.bg-primary.text-white.shadow-2
+q-toolbar.bg-brand.text-white.shadow-2
   q-toolbar-title Contacts
 q-list(bordered)
   q-item.q-my-sm(v-for='(user, key) in friends', :key='key', :to='"/chat/" + key', clickable)
     q-item-section(avatar)
-      q-avatar(color='primary', text-color='white')
+      q-avatar.bg-brand(text-color='white')
         | {{ user.name.charAt(0) }}
     q-item-section
       q-item-label.text-weight-light.text-subtitle2 {{ user.name }}
@@ -21,7 +21,7 @@ q-item.absolute-bottom.q-mb-xl(v-for='(user, key) in pending', :key='key')
       size='1.5rem'
     )
     q-icon.cursor-pointer(@click='denyRequest(key)', name='highlight_off', color='red', size='1.5rem')
-q-toolbar.absolute-bottom.bg-primary.text-white.shadow-2
+q-toolbar.absolute-bottom.bg-brand.text-white.shadow-2
   q-btn(icon='person_add', flat, dense, label='Add Friends')
   q-popup-edit(v-model='usernameInput', :cover='false', v-slot='scope', @keyup.enter='sendRequest()')
     q-input(v-model='scope.value', dense, autofocus, counter, @keyup.enter='scope.set')

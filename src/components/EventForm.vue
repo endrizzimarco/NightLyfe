@@ -111,6 +111,8 @@ import { mapState, mapActions } from 'vuex'
 import axios from 'axios'
 
 export default {
+  emits: ['submitted'],
+
   data() {
     return {
       eventData: {
@@ -136,6 +138,7 @@ export default {
       this.eventData['friends'] = this.friendsObject
       // Save eventData object under events node in db
       this.firebaseSubmitEvent(this.eventData)
+      this.$emit('submitted')
     },
 
     placesGetPredictions() {

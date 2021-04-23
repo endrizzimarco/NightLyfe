@@ -32,9 +32,9 @@ q-layout(view='lHh Lpr lFf')
     Friends
   //- Bottom Drawers
   q-dialog(v-model='newEvent', position='bottom')
-    EventForm
+    EventForm(@submitted='confirmEvent')
   q-dialog(v-model='newSignal', position='bottom')
-    SignalForm
+    SignalForm(@submitted='confirmSignal')
   //- Confirm Logout popup
   q-dialog(v-model='confirmLogout', persistent)
     q-card
@@ -52,7 +52,7 @@ q-layout(view='lHh Lpr lFf')
     q-page-sticky(position='bottom-right', :offset='[18, 105]')
       q-btn(@click='rightDrawer = !rightDrawer', fab, color='primary', icon='chat')
     q-page-sticky(position='bottom', :offset='[18, 36]')
-      q-fab(vertical-actions-align='center', color='secondary', icon='add', direction='up')
+      q-fab(vertical-actions-align='center', color='teal-14', icon='add', direction='up')
         q-fab-action(@click='newEvent = true', color='orange', icon='add_location', label='New Event')
         q-fab-action(@click='newSignal = true', color='accent', icon='notification_add', label='New Signal')
 </template>
@@ -87,6 +87,35 @@ export default {
       this.$router.push('/auth')
       this.logoutUser()
     },
+
+    confirmSignal() {
+      this.newSignal = false
+      this.$q.notify({
+        message: 'Signal Sent',
+        color: 'orange',
+        actions: [
+          {
+            label: '✕',
+            color: 'white'
+          }
+        ]
+      })
+    },
+
+    confirmEvent() {
+      this.newEvent = false
+      this.$q.notify({
+        message: 'Event Submitted',
+        color: 'accent',
+        actions: [
+          {
+            label: '✕',
+            color: 'white'
+          }
+        ]
+      })
+    },
+
     ...mapActions('firebase', ['logoutUser'])
   },
 

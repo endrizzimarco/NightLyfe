@@ -1,8 +1,8 @@
 import { store } from 'quasar/wrappers'
 import { createStore } from 'vuex'
 
-import mapStyles from './mapStyles'
-import menuList from './menuList'
+import mapStyles from './data/mapStyles'
+import menuList from './data/menuList'
 import firebase from './firebase'
 
 // import example from './module-example'

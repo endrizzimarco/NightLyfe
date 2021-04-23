@@ -37,6 +37,8 @@ q-card.full-width
 import { mapActions } from 'vuex'
 
 export default {
+  emits: ['submitted'],
+
   data() {
     return {
       signalType: null,
@@ -48,6 +50,7 @@ export default {
   methods: {
     submitSignal() {
       this.firebaseSendSignal({ type: this.signalType, details: this.details })
+      this.$emit('submitted')
     },
     ...mapActions('firebase', ['firebaseSendSignal'])
   },

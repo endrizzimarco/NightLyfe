@@ -13,8 +13,14 @@ export default defineComponent({
     ...mapActions('firebase', ['handleAuthStateChanged'])
   },
 
-  mounted() {
+  created() {
     this.handleAuthStateChanged()
   }
 })
 </script>
+
+<style>
+.bg-brand {
+  background: #135292;
+}
+</style>

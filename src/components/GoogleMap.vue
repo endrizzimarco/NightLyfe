@@ -12,15 +12,18 @@ q-toggle(
 q-btn(
   @click='centerMap()',
   fab,
-  color='black',
+  color='grey-10',
   icon='my_location',
   style='position: absolute; right: 1.25em; bottom: 2.5em; z-index: 1'
-)
+) 
 </template> 
 
 <script>
-import { mapState, mapActions } from 'vuex'
+import { mapState, mapActions, mapGetters } from 'vuex'
+import { ref } from 'vue'
 import axios from 'axios'
+
+var userMarkers = ref({})
 
 export default {
   name: 'GoogleMap',
@@ -29,10 +32,10 @@ export default {
     return {
       toggle: false,
       map: null,
+      positionMarker: null,
       heatmap: null,
       places: [],
-      crimes: [],
-      dataFetched: false
+      crimes: []
     }
   },
 
@@ -196,7 +199,7 @@ export default {
       })
 
       // Initializes your position on the map
-      new google.maps.Marker({
+      this.positionMarker = new google.maps.Marker({
         position: new google.maps.LatLng(this.center.lat, this.center.lng),
         map: map
       })
@@ -240,7 +243,13 @@ export default {
         this.mapsAddEvent(event)
       }
 
-      this.dataFetched = true
+      // Add all users saved in the store on the map
+      for (const userId in this.users) {
+        this.mapsAddUserMarker(userId)
+      }
+
+      // Reinitialize user on the map
+      this.geolocate()
     },
 
     /* Creates markers and infoWindows for every relevant nightlife establishment in the area */
@@ -340,49 +349,87 @@ export default {
       }
     },
 
+    mapsAddUserMarker(userId) {
+      var userPosition = this.users[userId].position
+
+      userMarkers[userId] = new google.maps.Marker({
+        position: new google.maps.LatLng(userPosition.lat, userPosition.lng),
+        map: this.map,
+        icon: 'https://img.icons8.com/nolan/64/men-age-group-4--v2.png'
+      })
+    },
+
+    mapsRemoveUserMarker(userId) {
+      userMarkers[userId].setMap(null)
+      delete userMarkers[userId]
+    },
+
+    mapsMoveUserMarker(userId) {
+      let newPosition = this.users[userId].position
+      userMarkers[userId].setPosition(newPosition)
+    },
+
     ...mapActions('firebase', ['firebaseSavePosition'])
   },
 
   computed: {
     ...mapState(['mapStyles']),
-    ...mapState('firebase', ['center', 'signals', 'latestSignalKey', 'events', 'latestEventKey'])
+    ...mapState('firebase', ['users', 'signals', 'events']),
+    ...mapGetters('firebase', ['center', 'latestUserChange', 'latestSignalKey', 'latestEventKey'])
   },
 
   watch: {
+    center(newValue) {
+      if (this.map) {
+        this.positionMarker.setPosition(newValue)
+      }
+    },
+
+    latestUserChange: {
+      deep: true,
+      // Whenever a new event gets added, add it to the map
+      handler() {
+        if (this.latestUserChange.type == 'add') {
+          this.mapsAddUserMarker(this.latestUserChange.userId)
+        } else if (this.latestUserChange.type == 'remove') {
+          this.mapsRemoveUserMarker(this.latestUserChange.userId)
+        } else if (this.latestUserChange.type == 'move') {
+          this.mapsMoveUserMarker(this.latestUserChange.userId)
+        }
+      }
+    },
+
     // Keep an eye on the signal object in the store
-    signals: {
+    latestSignalKey: {
       deep: true,
       // Whenever a new signal gets added, add it to the map
       handler() {
         // If db signals have been fetched start tracking new events
-        if (this.dataFetched === true) {
-          let signal = this.signals[this.latestSignalKey]
-          this.mapsAddSignal(signal)
-        }
+        let signal = this.signals[this.latestSignalKey]
+        this.mapsAddSignal(signal)
       }
     },
-    events: {
+
+    latestEventKey: {
       deep: true,
       // Whenever a new event gets added, add it to the map
       handler() {
         // If db events have been fetched start tracking new events
-        if (this.dataFetched === true) {
-          let event = this.events[this.latestEventKey]
-          this.mapsAddEvent(event)
-        }
+        let event = this.events[this.latestEventKey]
+        this.mapsAddEvent(event)
       }
     }
   },
 
-  async mounted() {
+  async created() {
     // Wait for current location to be fetched and saved to store
     await this.geolocate()
     // Wait for map and map components to be loaded
     await this.initMap()
-    // Geolocate user every 30 seconds if on Index page
+    // Geolocate user every 10 seconds if on Index page
     this.interval = window.setInterval(() => {
       this.geolocate()
-    }, 30000)
+    }, 10000)
   },
 
   unmounted() {
