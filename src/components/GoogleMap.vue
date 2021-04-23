@@ -361,6 +361,11 @@ export default {
       delete userMarkers[userId]
     },
 
+    mapsMoveUserMarker(userId) {
+      let newPosition = this.users[userId].position
+      userMarkers[userId].setPosition(newPosition)
+    },
+
     ...mapActions('firebase', ['firebaseSavePosition'])
   },
 
@@ -385,6 +390,8 @@ export default {
           this.mapsAddUserMarker(this.latestUserChange.userId)
         } else if (this.latestUserChange.type == 'remove') {
           this.mapsRemoveUserMarker(this.latestUserChange.userId)
+        } else if (this.latestUserChange.type == 'move') {
+          this.mapsMoveUserMarker(this.latestUserChange.userId)
         }
       }
     },

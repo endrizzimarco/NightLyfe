@@ -45,6 +45,15 @@ const mutations = {
     state.latestUserChange.type = 'remove'
   },
 
+  updateUserPosition(state, payload) {
+    state.users[payload.userId].position = payload.userPosition
+
+    state.latestUserChange.userId = payload.userId
+    state.latestUserChange.type = 'move'
+    state.latestUserChange.pos = payload.userPosition
+    
+  },
+
   // Adds a message in 'messages' object
   addMessage(state, payload) {
     state.messages[payload.messageId] = payload.messageDetails
@@ -189,23 +198,36 @@ const actions = {
     firebaseDb.ref('status/').on('child_added', snapshot => {
       var userKey = snapshot.key
       firebaseDb.ref('status/' + userKey).on('value', snapshot => {
-        if (snapshot.val().online == false && userKey in state.users) {
-          commit('removeUser', userKey)
-        }
-        else if (snapshot.val().online == true) {
+        // Only check for online users
+        if (snapshot.val().online == true) {
           let currPos = state.center
           let userPos = snapshot.val().position
           let dist = getDistance(currPos.lat, currPos.lng, userPos.lat, userPos.lng)
-
-          if (dist < 1.5 && userKey != state.userDetails.userId) {
-            commit('addUser', {
+          // Check if user is close to you 
+          if (dist < 1.5) {
+            // If user is already saved update his position
+            if (userKey in state.users) {
+              commit('updateUserPosition', {
+                userId: userKey,
+                userPosition: snapshot.val().position
+              })
+            }
+            // If user is not save, store it locally in users
+            else if (userKey != state.userDetails.userId) {
+              commit('addUser', {
               userId: userKey,
               userDetails: snapshot.val()
-            })
+              })
+            }
           }
+          // If a saved user has gone out of bounds remove him
           else if (userKey in state.users) {
             commit('removeUser', userKey)
           }
+        }
+        // If a saved user has gone offline remove him
+        else if (userKey in state.users) {
+          commit('removeUser', userKey)
         }
       })
     })
