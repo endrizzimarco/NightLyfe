@@ -92,7 +92,7 @@ export default {
       this.newSignal = false
       this.$q.notify({
         message: 'Signal Sent',
-        color: 'orange',
+        color: 'accent',
         actions: [
           {
             label: '✕',
@@ -106,7 +106,7 @@ export default {
       this.newEvent = false
       this.$q.notify({
         message: 'Event Submitted',
-        color: 'accent',
+        color: 'orange',
         actions: [
           {
             label: '✕',
