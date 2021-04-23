@@ -1,24 +1,26 @@
 <template lang="pug">
 q-card.full-width
-  //- Create Signal Header
-  q-card-section.bg-blue-grey-1(style='padding: 8px')
-    span.text-subtitle1.text-weight-light.text-blue-grey-10.q-ml-sm Create new signal
-    q-chip.float-right(
-      @click='submitSignal()',
-      clickable,
-      color='accent',
-      text-color='white',
-      icon='done',
-      style='margin-top: -1px'
-    ) Create Signal
   //- Create Signal Form
-  q-card-section
-    //- Event name field
-    .row.q-pb-md
+  q-form(@submit='submitSignal', ref='signalForm')
+    //- Create Signal Header
+    q-card-section.bg-blue-grey-1(style='padding: 8px')
+      span.text-subtitle1.text-weight-light.text-blue-grey-10.q-ml-sm Create new signal
+      q-chip.float-right(
+        @click='submitSignal()',
+        clickable,
+        color='accent',
+        text-color='white',
+        icon='done',
+        style='margin-top: -1px'
+      ) Create Signal
+    .q-pa-md
+      //- Event name field
       span.text-subtitle1.text-blue-grey-10 Type of signal:
       q-select.full-width(
         v-model='signalType',
         :options='options',
+        lazy-rules,
+        :rules='[val => val !== null || "Please select a signal type."]',
         label='Signal type',
         transition-show='flip-up',
         transition-hide='flip-down',
@@ -27,8 +29,7 @@ q-card.full-width
       )
         template(v-slot:prepend)
           q-icon(:name='icon')
-    //- Event details field
-    .row
+      //- Event details field
       span.text-subtitle1.text-blue-grey-10 Details:
       q-input.full-width(v-model='details', rounded, outlined, autogrow, placeholder='Describe the situation')
 </template>
@@ -49,9 +50,14 @@ export default {
 
   methods: {
     submitSignal() {
-      this.firebaseSendSignal({ type: this.signalType, details: this.details })
-      this.$emit('submitted')
+      this.$refs.signalForm.validate().then(success => {
+        if (success) {
+          this.firebaseSendSignal({ type: this.signalType, details: this.details })
+          this.$emit('submitted')
+        }
+      })
     },
+
     ...mapActions('firebase', ['firebaseSendSignal'])
   },
 

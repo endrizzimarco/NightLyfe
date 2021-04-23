@@ -12,14 +12,16 @@ q-card.full-width
       style='margin-top: -1px'
     ) Submit Event
   //- 'Create Event' Form
-  q-card-section
+  q-form.q-pa-md(ref='eventForm')
     //- Event name field
     .row.q-pb-md
       q-input.full-width(
         v-model='eventData.name',
+        :dense='true',
+        :rules='[val => (val !== null && val !== "") || "Please insert a name for the event."]',
+        lazy-rules,
         rounded,
         outlined,
-        :dense='true',
         label='Event Name',
         placeholder='Birthday Party'
       )
@@ -30,19 +32,23 @@ q-card.full-width
     .row.q-pb-md.no-wrap
       q-input(
         v-model='eventData.date',
+        :dense='true',
+        :rules='[val => val !== null || "Please insert a valid date for the event."]',
+        lazy-rules,
         rounded,
         outlined,
         type='date',
-        :dense='true',
         hint='Date of Event',
         style='width: 60%'
       )
       q-input.q-ml-sm(
         v-model='eventData.time',
+        :dense='true',
+        :rules='[val => val !== null || "Please insert a valid time for the event."]',
+        lazy-rules,
         rounded,
         outlined,
         type='time',
-        :dense='true',
         hint='Time of the Event',
         style='width: 40%'
       )
@@ -54,6 +60,8 @@ q-card.full-width
         @input-value='setUserInput',
         :options='placesOptions',
         :dense='true',
+        :rules='[val => (val !== null && val !== "") || "Please select a location for the event."]',
+        lazy-rules,
         label='Search places',
         rounded,
         outlined,
@@ -74,7 +82,7 @@ q-card.full-width
         v-model='eventData.friends',
         :dense='true',
         :options='friendsOptions',
-        label='Select friends',
+        lazy-rules,
         rounded,
         outlined,
         multiple,
@@ -91,9 +99,9 @@ q-card.full-width
         v-for='eventType in ["Home", "Baloons", "Dancing", "Champagne", "Dj", "Gift"]',
         @click='eventData.type = eventType',
         :src='getEventIcon(eventType)',
-        :style='eventData.type == eventType ? "box-shadow: 0 0 1pt 2pt #03c6fc; border-radius: 30%" : ""'
+        :style='eventData.type == eventType ? "box-shadow: 0 0 1pt 2pt #0080ff; border-radius: 30%" : ""'
       )
-    //- Event insert details field
+    //- Event details field
     .row
       span.text-subtitle1.text-blue-grey-10 Details:
       q-input.full-width(
@@ -120,7 +128,7 @@ export default {
         date: null,
         time: null,
         friends: [],
-        type: '',
+        type: 'Home',
         details: ''
       },
       location: '',
@@ -131,14 +139,18 @@ export default {
   },
 
   methods: {
-    async submitEvent() {
-      // Turn place name into coordinates to save in db
-      await this.geocodeLocation()
-      // Need to turn array into object before saving to db
-      this.eventData['friends'] = this.friendsObject
-      // Save eventData object under events node in db
-      this.firebaseSubmitEvent(this.eventData)
-      this.$emit('submitted')
+    submitEvent() {
+      this.$refs.eventForm.validate().then(async success => {
+        if (success) {
+          // Turn place name into coordinates to save in db
+          await this.geocodeLocation()
+          // Need to turn array into object before saving to db
+          this.eventData['friends'] = this.friendsObject
+          // Save eventData object under events node in db
+          this.firebaseSubmitEvent(this.eventData)
+          this.$emit('submitted')
+        }
+      })
     },
 
     placesGetPredictions() {
