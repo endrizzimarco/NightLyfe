@@ -32,9 +32,9 @@ q-layout(view='lHh Lpr lFf')
     Friends
   //- Bottom Drawers
   q-dialog(v-model='newEvent', position='bottom')
-    EventForm
+    EventForm(@submitted='confirmEvent')
   q-dialog(v-model='newSignal', position='bottom')
-    SignalForm
+    SignalForm(@submitted='confirmSignal')
   //- Confirm Logout popup
   q-dialog(v-model='confirmLogout', persistent)
     q-card
@@ -87,6 +87,35 @@ export default {
       this.$router.push('/auth')
       this.logoutUser()
     },
+
+    confirmSignal() {
+      this.newSignal = false
+      this.$q.notify({
+        message: 'Signal Sent',
+        color: 'orange',
+        actions: [
+          {
+            label: '✕',
+            color: 'white'
+          }
+        ]
+      })
+    },
+
+    confirmEvent() {
+      this.newEvent = false
+      this.$q.notify({
+        message: 'Event Submitted',
+        color: 'accent',
+        actions: [
+          {
+            label: '✕',
+            color: 'white'
+          }
+        ]
+      })
+    },
+
     ...mapActions('firebase', ['logoutUser'])
   },
 
