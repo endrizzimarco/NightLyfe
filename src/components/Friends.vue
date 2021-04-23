@@ -66,7 +66,7 @@ export default {
 
     sendRequest() {
       this.showNotif()
-      this.firebaseSendFriendRequest(this.usernameInput.slice(1))
+      this.firebaseSendFriendRequest(this.usernameInput)
       this.usernameInput = ''
     },
     ...mapActions('firebase', ['firebaseRemovePending', 'firebaseAcceptRequest', 'firebaseSendFriendRequest'])
