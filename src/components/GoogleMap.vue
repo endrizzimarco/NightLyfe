@@ -90,7 +90,7 @@ export default {
       const URL = `https://secret-ocean-49799.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${this.center.lat},${this.center.lng}
                     &radius=1500
                     &keyword=nightlife
-                    &key=AIzaSyBPUdoB3wV6A9L-H1-J5POiQRmgqqcL9Bk`
+                    &key=AIzaSyB9Dav9F3qIlHcu9s4zuYbkt5mYBdrHJws`
       await axios
         .get(URL)
         .then(response => {
@@ -105,7 +105,7 @@ export default {
     getPlaceImage(place) {
       if (place.photos) {
         const URL =
-          `https://secret-ocean-49799.herokuapp.com/https://maps.googleapis.com/maps/api/place/photo?maxwidth=120&key=AIzaSyBPUdoB3wV6A9L-H1-J5POiQRmgqqcL9Bk&photoreference=` +
+          `https://secret-ocean-49799.herokuapp.com/https://maps.googleapis.com/maps/api/place/photo?maxwidth=120&key=AIzaSyB9Dav9F3qIlHcu9s4zuYbkt5mYBdrHJws&photoreference=` +
           place.photos[0].photo_reference
         return `<img src="${URL}" height="80" width="60">`
       }
