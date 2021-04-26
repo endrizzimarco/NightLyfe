@@ -24,6 +24,8 @@ import { ref } from 'vue'
 import axios from 'axios'
 
 var userMarkers = ref({})
+var signalMarkers = ref({})
+var eventMarkers = ref({})
 
 export default {
   name: 'GoogleMap',
@@ -231,6 +233,10 @@ export default {
       // Save heatmap reference for user in toggleHeatmap()
       this.heatmap = heatmap
 
+      // Slow down!!!
+      if (!this.signals) {
+        await this.sleep(100)
+      }
       // Add all signals saved in the store on the map
       for (const i in this.signals) {
         let signal = this.signals[i]
@@ -278,22 +284,29 @@ export default {
     },
 
     /* Code snippet to add a marker and info window on the map for a signal */
-    mapsAddSignal(signal) {
+    mapsAddSignal(signalId) {
+      var signal = this.signals[signalId]
       var infoWindow = new google.maps.InfoWindow()
 
-      let marker = new google.maps.Marker({
+      signalMarkers[signalId] = new google.maps.Marker({
         position: new google.maps.LatLng(signal.lat, signal.lng),
         map: this.map,
         icon: this.getSignalIcon(signal.type)
       })
 
-      google.maps.event.addListener(marker, 'click', () => {
+      google.maps.event.addListener(signalMarkers[signalId], 'click', () => {
         infoWindow.setContent(
           `<p class="text-subtitle1" style="margin-bottom:8px;">${signal.type}</p>
             <p class="text-weight-light">${signal.details}</p>`
         )
-        infoWindow.open(this.map, marker)
+        infoWindow.open(this.map, signalMarkers[signalId])
       })
+    },
+
+    /* Removes the signal marker from the map */
+    mapsRemoveSignal(signalId) {
+      signalMarkers[signalId].setMap(null)
+      delete signalMarkers[signalId]
     },
 
     /* Returns the image source for every type of signal */
@@ -313,22 +326,29 @@ export default {
     },
 
     /* Code snippet to add a marker and info window on the map for an event */
-    mapsAddEvent(event) {
+    mapsAddEvent(eventId) {
+      var event = this.events[eventId]
       var infoWindow = new google.maps.InfoWindow()
 
-      let marker = new google.maps.Marker({
+      eventMarkers[eventId] = new google.maps.Marker({
         position: new google.maps.LatLng(event.lat, event.lng),
         map: this.map,
         icon: this.getEventIcon(event.type)
       })
 
-      google.maps.event.addListener(marker, 'click', () => {
+      google.maps.event.addListener(eventMarkers[eventId], 'click', () => {
         infoWindow.setContent(
           `<p class="text-subtitle1" style="margin-bottom:8px;">${event.name} (${event.date} ${event.time}) </p>
             <p class="text-weight-light">${event.details}</p>`
         )
-        infoWindow.open(this.map, marker)
+        infoWindow.open(this.map, eventMarkers[eventId])
       })
+    },
+
+    /* Removes the event marker from the map */
+    mapsRemoveEvent(eventId) {
+      eventMarkers[eventId].setMap(null)
+      delete eventMarkers[eventId]
     },
 
     /* Returns the image source for every type of event */
@@ -369,13 +389,17 @@ export default {
       userMarkers[userId].setPosition(newPosition)
     },
 
+    sleep(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms))
+    },
+
     ...mapActions('firebase', ['firebaseSavePosition'])
   },
 
   computed: {
     ...mapState(['mapStyles']),
     ...mapState('firebase', ['users', 'signals', 'events']),
-    ...mapGetters('firebase', ['center', 'latestUserChange', 'latestSignalKey', 'latestEventKey'])
+    ...mapGetters('firebase', ['center', 'latestUserChange', 'latestSignalChange', 'latestEventChange'])
   },
 
   watch: {
@@ -387,36 +411,42 @@ export default {
 
     latestUserChange: {
       deep: true,
-      // Whenever a new event gets added, add it to the map
+      // Watch for user related changes
       handler() {
+        let userId = this.latestUserChange.userId
         if (this.latestUserChange.type == 'add') {
-          this.mapsAddUserMarker(this.latestUserChange.userId)
+          this.mapsAddUserMarker(userId)
         } else if (this.latestUserChange.type == 'remove') {
-          this.mapsRemoveUserMarker(this.latestUserChange.userId)
+          this.mapsRemoveUserMarker(userId)
         } else if (this.latestUserChange.type == 'move') {
-          this.mapsMoveUserMarker(this.latestUserChange.userId)
+          this.mapsMoveUserMarker(userId)
         }
       }
     },
 
-    // Keep an eye on the signal object in the store
-    latestSignalKey: {
+    latestSignalChange: {
       deep: true,
-      // Whenever a new signal gets added, add it to the map
+      // Watch for signal related changes
       handler() {
-        // If db signals have been fetched start tracking new events
-        let signal = this.signals[this.latestSignalKey]
-        this.mapsAddSignal(signal)
+        let signalId = this.latestSignalChange.signalId
+        if (this.latestSignalChange.type == 'add') {
+          this.mapsAddSignal(signalId)
+        } else if (this.latestSignalChange.type == 'remove') {
+          this.mapsRemoveSignal(signalId)
+        }
       }
     },
 
-    latestEventKey: {
+    latestEventChange: {
       deep: true,
-      // Whenever a new event gets added, add it to the map
+      // Watch for events related changes
       handler() {
-        // If db events have been fetched start tracking new events
-        let event = this.events[this.latestEventKey]
-        this.mapsAddEvent(event)
+        let eventId = this.latestEventChange.eventId
+        if (this.latestEventChange.type == 'add') {
+          this.mapsAddEvent(eventId)
+        } else if (this.latestEventChange.type == 'remove') {
+          this.mapsRemoveEvent(eventId)
+        }
       }
     }
   },
