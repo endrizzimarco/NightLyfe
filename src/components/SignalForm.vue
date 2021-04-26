@@ -52,7 +52,7 @@ export default {
     submitSignal() {
       this.$refs.signalForm.validate().then(success => {
         if (success) {
-          this.firebaseSendSignal({ type: this.signalType, details: this.details })
+          this.firebaseSendSignal({ type: this.signalType, details: this.details, timestamp: Date.now() })
           this.$emit('submitted')
         }
       })

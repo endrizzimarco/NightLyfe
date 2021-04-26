@@ -144,8 +144,8 @@ export default {
         if (success) {
           // Turn place name into coordinates to save in db
           await this.geocodeLocation()
-          // Need to turn array into object before saving to db
-          this.eventData['friends'] = this.friendsObject
+          this.eventData['friends'] = this.friendsObject // turn array into object
+          this.eventData['timestamp'] = Date.now() // add timestamp
           // Save eventData object under events node in db
           this.firebaseSubmitEvent(this.eventData)
           this.$emit('submitted')
