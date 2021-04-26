@@ -12,8 +12,8 @@ const state = {
   pending: {}, // Current user's pending friend request
   signals: {}, // Current signals in a 1.5km radius
   events: {}, // All events in a 10km radius
-  latestSignalKey: null, // Key of last added signal
-  latestEventKey: null, // Key of last added event
+  latestSignalChange: {signalId: null, type: null}, // Latest change to signals object
+  latestEventChange: {eventId: null, type: null}, // Latest change to events object
   latestUserChange: {userId: null, type: null} // Latest change to users object
 }
 
@@ -88,13 +88,35 @@ const mutations = {
   // Adds a signal in 'signals' object
   addSignal(state, payload) {
     state.signals[payload.signalId] = payload.signalDetails
-    state.latestSignalKey = payload.signalId
+
+    state.latestSignalChange.signalId = payload.signalId
+    state.latestSignalChange.type = 'add'
+  },
+
+  // Removes a signal in the 'signals' object
+  removeSignal(state, payload) {
+    let signalId = payload
+    delete state.signals[signalId]
+
+    state.latestSignalChange.signalId = signalId
+    state.latestSignalChange.type = 'remove'
   },
 
   // Adds an event in 'events' object
   addEvent(state, payload) {
     state.events[payload.eventId] = payload.eventDetails  
-    state.latestEventKey = payload.eventId
+    
+    state.latestEventChange.eventId = payload.eventId
+    state.latestEventChange.type = 'add'
+  },
+
+  // Remove an event in the 'events' object
+  removeEvent(state, payload) {
+    let eventId = payload
+    delete state.events[eventId]
+
+    state.latestEventChange.eventId = eventId
+    state.latestEventChange.type = 'remove'
   }
 }
 
@@ -328,6 +350,10 @@ const actions = {
         })
       }
     })
+    // Remove old signals locally
+    firebaseDb.ref('signals/').on('child_removed', snapshot => {
+      commit('removeSignal', snapshot.key)
+    })
   },
 
   /* Add signal under signals node in firebase's db */
@@ -362,6 +388,10 @@ const actions = {
           eventDetails: snapshot.val()
         })
       }
+    })
+    // Remove old events locally
+    firebaseDb.ref('events/').on('child_removed', snapshot => {
+      commit('removeEvent', snapshot.key)
     })
   },
 
@@ -465,11 +495,11 @@ const getters = {
   latestUserChange: state => {
     return state.latestUserChange
   },
-  latestSignalKey: state => {
-    return state.latestSignalKey
+  latestSignalChange: state => {
+    return state.latestSignalChange
   },
-  latestEventKey: state => {
-    return state.latestEventKey
+  latestEventChange: state => {
+    return state.latestEventChange
   },
 
 }
