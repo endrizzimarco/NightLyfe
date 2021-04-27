@@ -235,8 +235,9 @@ export default {
 
       // Slow down!!!
       if (!this.signals) {
-        await this.sleep(100)
+        await this.sleep(1000)
       }
+
       // Add all signals saved in the store on the map
       for (const i in this.signals) {
         let signal = this.signals[i]
