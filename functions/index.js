@@ -7,7 +7,7 @@ exports.deleteOldSignals = functions.pubsub
     .schedule("* * * * *").onRun(() => {
       const ref = admin.database().ref("signals"); // reference to the items
       const now = Date.now();
-      const cutoff = now - 2 * 60 * 1000; // 2m
+      const cutoff = now - 10 * 60 * 1000; // 10m
       const oldItemsQuery = ref.orderByChild("timestamp").endAt(cutoff);
       return oldItemsQuery.once("value", function(snapshot) {
         // create a map with all children that need to be removed
