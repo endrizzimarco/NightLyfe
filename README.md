@@ -1,4 +1,4 @@
-# Nightlyfe (group23_com2027)
+# NightLyfe (group23_com2027)
 
 Enhance your nightlife experience
 

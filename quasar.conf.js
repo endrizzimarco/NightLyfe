@@ -122,8 +122,8 @@ module.exports = configure(function (/* ctx */) {
       },
 
       manifest: {
-        name: `Nightlyfe`,
-        short_name: `Nightlyfe`,
+        name: `NightLyfe`,
+        short_name: `NightLyfe`,
         description: `Enhance your nightlife experience `,
         display: 'standalone',
         orientation: 'portrait',
