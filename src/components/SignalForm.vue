@@ -1,7 +1,7 @@
 <template lang="pug">
 q-card.full-width
   //- Create Signal Form
-  q-form(@submit='submitSignal', ref='signalForm')
+  q-form(@submit='submitSignal', ref='signalForm', data-cy='signalForm')
     //- Create Signal Header
     q-card-section.bg-blue-grey-1(style='padding: 8px')
       span.text-subtitle1.text-weight-light.text-blue-grey-10.q-ml-sm Create new signal
@@ -25,7 +25,8 @@ q-card.full-width
         transition-show='flip-up',
         transition-hide='flip-down',
         rounded,
-        outlined
+        outlined,
+        data-cy='signalType'
       )
         template(v-slot:prepend)
           q-icon(:name='icon')
