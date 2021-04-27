@@ -12,7 +12,7 @@ q-card.full-width
       style='margin-top: -1px'
     ) Submit Event
   //- 'Create Event' Form
-  q-form.q-pa-md(ref='eventForm')
+  q-form.q-pa-md(ref='eventForm', data-cy='eventForm')
     //- Event name field
     .row.q-pb-md
       q-input.full-width(
@@ -82,7 +82,6 @@ q-card.full-width
         v-model='eventData.friends',
         :dense='true',
         :options='friendsOptions',
-        lazy-rules,
         rounded,
         outlined,
         multiple,
