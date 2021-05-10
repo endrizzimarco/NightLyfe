@@ -4,7 +4,7 @@ q-card.full-width
   q-card-section.bg-blue-grey-1(style='padding: 8px')
     span.text-subtitle1.text-weight-light.text-blue-grey-10.q-ml-sm Create your event
     q-chip.float-right(
-      @click='submitEvent()',
+      @click='validateEvent()',
       clickable,
       color='primary',
       text-color='white',
@@ -12,7 +12,7 @@ q-card.full-width
       style='margin-top: -1px'
     ) Submit Event
   //- 'Create Event' Form
-  q-form.q-pa-md(ref='eventForm')
+  q-form.q-pa-md(ref='eventForm', data-cy='eventForm')
     //- Event name field
     .row.q-pb-md
       q-input.full-width(
@@ -82,7 +82,6 @@ q-card.full-width
         v-model='eventData.friends',
         :dense='true',
         :options='friendsOptions',
-        lazy-rules,
         rounded,
         outlined,
         multiple,
@@ -116,7 +115,6 @@ q-card.full-width
 
 <script>
 import { mapState, mapActions } from 'vuex'
-import axios from 'axios'
 
 export default {
   emits: ['submitted'],
@@ -139,18 +137,27 @@ export default {
   },
 
   methods: {
-    submitEvent() {
-      this.$refs.eventForm.validate().then(async success => {
+    validateEvent() {
+      this.$refs.eventForm.validate().then(success => {
         if (success) {
           // Turn place name into coordinates to save in db
-          await this.geocodeLocation()
-          this.eventData['friends'] = this.friendsObject // turn array into object
-          this.eventData['timestamp'] = Date.now() // add timestamp
-          // Save eventData object under events node in db
-          this.firebaseSubmitEvent(this.eventData)
-          this.$emit('submitted')
+          this.geocodeLocation()
         }
       })
+    },
+
+    submitEvent(results, status) {
+      if (status == 'OK') {
+        this.eventData['lat'] = results[0].geometry.location.lat()
+        this.eventData['lng'] = results[0].geometry.location.lng()
+        this.eventData['friends'] = this.friendsObject // turn array into object
+        this.eventData['timestamp'] = Date.now() // add timestamp
+        // Save eventData object under events node in db
+        this.firebaseSubmitEvent(this.eventData)
+        this.$emit('submitted')
+      } else {
+        console.log('Geocode was not successful for the following reason: ' + status)
+      }
     },
 
     placesGetPredictions() {
@@ -172,20 +179,9 @@ export default {
       this.searchResults = predictions
     },
 
-    async geocodeLocation() {
-      const URL = `https://secret-ocean-49799.herokuapp.com/https://maps.googleapis.com/maps/api/place/details/json?place_id=${this.location}&fields=geometry&key=AIzaSyB9Dav9F3qIlHcu9s4zuYbkt5mYBdrHJws`
-
-      await axios
-        .get(URL)
-        .then(response => {
-          let placeLocation = response.data.result.geometry.location
-
-          this.eventData['lat'] = placeLocation.lat
-          this.eventData['lng'] = placeLocation.lng
-        })
-        .catch(error => {
-          console.log(error)
-        })
+    geocodeLocation() {
+      var geocoder = new google.maps.Geocoder()
+      geocoder.geocode({ placeId: this.location }, this.submitEvent)
     },
 
     getEventIcon(eventType) {

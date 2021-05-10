@@ -2,7 +2,7 @@
   "name": "group23_com2027",
   "version": "0.0.1",
   "description": "Enhance your nightlife experience ",
-  "productName": "Nightlife App",
+  "productName": "NightLyfe",
   "author": "Group 23",
   "private": true,
   "scripts": {
@@ -20,6 +20,7 @@
   "devDependencies": {
     "@quasar/app": "^3.0.0-beta.1",
     "babel-eslint": "^10.0.1",
+    "cypress": "^7.2.0",
     "eslint": "^7.14.0",
     "eslint-config-prettier": "^6.15.0",
     "eslint-plugin-vue": "^7.0.0",
