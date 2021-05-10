@@ -89,13 +89,14 @@ export default {
     **********************/
     /* Finds 20 places related to keyword 'nightlife' in 1500m proximity of center coordinates */
     async findPlaces() {
-      const URL = `https://secret-ocean-49799.herokuapp.com/https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${this.center.lat},${this.center.lng}
+      const URL = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${this.center.lat},${this.center.lng}
                     &radius=1500
                     &keyword=nightlife
-                    &key=AIzaSyB9Dav9F3qIlHcu9s4zuYbkt5mYBdrHJws`
+                    &key=AIzaSyDWdpBzKsJwwTYInyEM7uH-pH7GNgDy2fs`
       await axios
         .get(URL)
         .then(response => {
+          console.log(response)
           this.places = response.data.results
         })
         .catch(error => {
@@ -107,7 +108,7 @@ export default {
     getPlaceImage(place) {
       if (place.photos) {
         const URL =
-          `https://secret-ocean-49799.herokuapp.com/https://maps.googleapis.com/maps/api/place/photo?maxwidth=120&key=AIzaSyB9Dav9F3qIlHcu9s4zuYbkt5mYBdrHJws&photoreference=` +
+          `https://maps.googleapis.com/maps/api/place/photo?maxwidth=120&key=AIzaSyDWdpBzKsJwwTYInyEM7uH-pH7GNgDy2fs&photoreference=` +
           place.photos[0].photo_reference
         return `<img src="${URL}" height="80" width="60">`
       }
@@ -235,19 +236,17 @@ export default {
 
       // Slow down!!!
       if (!this.signals) {
-        await this.sleep(1000)
+        await this.sleep(200)
       }
 
       // Add all signals saved in the store on the map
-      for (const i in this.signals) {
-        let signal = this.signals[i]
-        this.mapsAddSignal(signal)
+      for (const signalId in this.signals) {
+        this.mapsAddSignal(signalId)
       }
 
       // Add all event saved in the store on the map
-      for (const i in this.events) {
-        let event = this.events[i]
-        this.mapsAddEvent(event)
+      for (const eventId in this.events) {
+        this.mapsAddEvent(eventId)
       }
 
       // Add all users saved in the store on the map

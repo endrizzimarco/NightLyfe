@@ -172,7 +172,7 @@ export default {
     },
 
     async geocodeLocation() {
-      const URL = `https://secret-ocean-49799.herokuapp.com/https://maps.googleapis.com/maps/api/place/details/json?place_id=${this.location}&fields=geometry&key=AIzaSyB9Dav9F3qIlHcu9s4zuYbkt5mYBdrHJws`
+      const URL = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${this.location}&fields=geometry&key=AIzaSyDWdpBzKsJwwTYInyEM7uH-pH7GNgDy2fs`
 
       await axios
         .get(URL)
