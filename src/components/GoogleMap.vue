@@ -32,11 +32,11 @@ export default {
 
   data() {
     return {
+      service: null,
       toggle: false,
       map: null,
       positionMarker: null,
       heatmap: null,
-      places: [],
       crimes: []
     }
   },
@@ -88,31 +88,21 @@ export default {
           PLACES API
     **********************/
     /* Finds 20 places related to keyword 'nightlife' in 1500m proximity of center coordinates */
-    async findPlaces() {
-      const URL = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${this.center.lat},${this.center.lng}
-                    &radius=1500
-                    &keyword=nightlife
-                    &key=AIzaSyDWdpBzKsJwwTYInyEM7uH-pH7GNgDy2fs`
-      await axios
-        .get(URL)
-        .then(response => {
-          console.log(response)
-          this.places = response.data.results
-        })
-        .catch(error => {
-          console.log(error.message)
-        })
+    initPlaces() {
+      var request = {
+        location: new google.maps.LatLng(this.center.lat, this.center.lng),
+        radius: 1500,
+        keyword: 'nightlife'
+      }
+      this.service.nearbySearch(request, this.mapsAddPlacesMarkers)
     },
 
     /* Return hmtl img element of the first picture listed on maps for an establishment */
-    getPlaceImage(place) {
-      if (place.photos) {
-        const URL =
-          `https://maps.googleapis.com/maps/api/place/photo?maxwidth=120&key=AIzaSyDWdpBzKsJwwTYInyEM7uH-pH7GNgDy2fs&photoreference=` +
-          place.photos[0].photo_reference
-        return `<img src="${URL}" height="80" width="60">`
+    getPlaceImage(placeImage) {
+      if (!placeImage) {
+        return ''
       }
-      return ''
+      return `<img width="80" height="120" src="${placeImage[0].getUrl({ maxWidth: 80, maxHeight: 120 })}">`
     },
 
     /* Return specific icon based on first element of 'types' attribute for an establishment */
@@ -125,18 +115,6 @@ export default {
         icon = 'https://img.icons8.com/color/40/000000/food-and-wine.png'
       }
       return icon
-    },
-
-    /* Return a different html element based on whether an establishment is currently open or closed */
-    isPlaceOpen(place) {
-      if (place.opening_hours) {
-        let htmlElement = `<p class="text-negative">Closed</p>`
-        if (place.opening_hours.open_now) {
-          htmlElement = `<p class="text-positive">Open</p>`
-        }
-        return htmlElement
-      }
-      return ''
     },
 
     /*********************
@@ -201,6 +179,8 @@ export default {
         disableDefaultUI: true
       })
 
+      this.service = new google.maps.places.PlacesService(map)
+
       // Initializes your position on the map
       this.positionMarker = new google.maps.Marker({
         position: new google.maps.LatLng(this.center.lat, this.center.lng),
@@ -211,9 +191,7 @@ export default {
       this.map = map
 
       // Wait for google Places API to be finished fetching relevant data
-      await this.findPlaces()
-      // Mark all relevant places on the map
-      this.mapsInitPlaces()
+      this.initPlaces()
 
       // Wait for police.uk API to return crime data
       await this.getCrimeData()
@@ -259,12 +237,16 @@ export default {
     },
 
     /* Creates markers and infoWindows for every relevant nightlife establishment in the area */
-    mapsInitPlaces() {
+    mapsAddPlacesMarkers(results, status) {
+      if (status != google.maps.places.PlacesServiceStatus.OK) {
+        return
+      }
+
       var infoWindow = new google.maps.InfoWindow()
 
-      this.places.forEach(place => {
-        const lat = place.geometry.location.lat
-        const lng = place.geometry.location.lng
+      results.forEach(place => {
+        const lat = place.geometry.location.lat()
+        const lng = place.geometry.location.lng()
 
         let marker = new google.maps.Marker({
           position: new google.maps.LatLng(lat, lng),
@@ -274,7 +256,7 @@ export default {
 
         google.maps.event.addListener(marker, 'click', () => {
           infoWindow.setContent(
-            `<div class="row nowrap"><div class="col"> ${this.getPlaceImage(place)} ${this.isPlaceOpen(place)}</div>
+            `<div class="row nowrap"><div class="col"> ${this.getPlaceImage(place.photos)} </div>
             <div class="col-7"> <p class="text-subtitle2">${place.name}</p>
             <p class="text-weight-light">${place.vicinity}</p> <p>${place.rating} ⭐</p></div></div>`
           )
