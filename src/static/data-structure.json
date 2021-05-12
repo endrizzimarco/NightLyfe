@@ -1,8 +1,8 @@
 {
   "users": {
     "9HsxN1tMHNOfmQV3E16LNfcFTdc2": {
-      "name": "Test Name",
-      "username": "testusername",
+      "name": "John Doe",
+      "username": "thejohnny",
       "email": "test@test.com",
       "phone": null,
       "dob": null,
@@ -10,8 +10,8 @@
       "description": null
     },
     "Oqk3C1ownieYIm8K0KgFqRXhKs53": {
-      "name": "Scientific Pig",
-      "username": "dontlookitup",
+      "name": "Joe Carter",
+      "username": "carterjoe",
       "email": "test3@test.com",
       "phone": null,
       "dob": null,
@@ -19,7 +19,7 @@
       "description": null
     },
     "l7TY1PJocphLufQb3zN1tfRJYsy1": {
-      "name": "how is this working lmao",
+      "name": "Kyle Harper",
       "username": "amogus",
       "email": "test4@test.com",
       "phone": null,
@@ -28,39 +28,13 @@
       "description": null
     },
     "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": {
-      "name": "Eric Sauce",
-      "username": "theSaucer",
+      "name": "Karina Hall",
+      "username": "poggers",
       "email": "test2@test.com",
       "phone": null,
       "dob": null,
       "gender": null,
       "description": null
-    }
-  },
-  "chats": {
-    "9HsxN1tMHNOfmQV3E16LNfcFTdc2": {
-      "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": {
-        "MESSAGEID1": {
-          "text": "Why eric 'sauce'?",
-          "from": "them"
-        },
-        "MESSAGEID2": {
-          "text": "Spaget",
-          "from": "me"
-        }
-      }
-    },
-    "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": {
-      "9HsxN1tMHNOfmQV3E16LNfcFTdc2": {
-        "MESSAGEID1": {
-          "text": "Why eric 'sauce'?",
-          "from": "me"
-        },
-        "MESSAGEID2": {
-          "text": "Spaget",
-          "from": "them"
-        }
-      }
     }
   },
   "friends": {
@@ -75,9 +49,33 @@
     }
   },
   "status": {
-    "9HsxN1tMHNOfmQV3E16LNfcFTdc2": false,
-    "Oqk3C1ownieYIm8K0KgFqRXhKs53": false, 
-    "l7TY1PJocphLufQb3zN1tfRJYsy1": false, 
-    "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": false
+    "9HsxN1tMHNOfmQV3E16LNfcFTdc2": {
+      "online" : false,
+      "position": {
+        "lat": 51.239300,
+        "lng": -0.584890
+      }
+    },
+    "Oqk3C1ownieYIm8K0KgFqRXhKs53": {
+      "online" : false,
+      "position": {
+        "lat": 51.239300,
+        "lng": -0.584890
+      }
+    }, 
+    "l7TY1PJocphLufQb3zN1tfRJYsy1": {
+      "online" : false,
+      "position": {
+        "lat": 51.239300,
+        "lng": -0.584890
+      }
+    },
+    "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": {
+      "online" : false,
+      "position": {
+        "lat": 51.239300,
+        "lng": -0.584890
+      }
+    }
   }
 }
