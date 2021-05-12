@@ -71,7 +71,9 @@ const mutations = {
 
   // Modify friends' online status as they go offline / online
   updateFriendStatus(state, payload) {
-    state.friends[payload.userId].online = payload.online
+    if(state.friends[payload.userId]) {
+      state.friends[payload.userId].online = payload.online
+    }
   },
 
   // Adds a pending friend request in 'pending' object
