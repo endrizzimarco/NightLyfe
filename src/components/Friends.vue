@@ -23,13 +23,12 @@ q-item.absolute-bottom.q-mb-xl(v-for='(user, key) in pending', :key='key')
     q-icon.cursor-pointer(@click='denyRequest(key)', name='highlight_off', color='red', size='1.5rem')
 q-toolbar.absolute-bottom.bg-brand.text-white.shadow-2
   q-btn(icon='person_add', flat, dense, label='Add Friends')
-  q-popup-edit(v-model='usernameInput', :cover='false', v-slot='scope', @keyup.enter='sendRequest()')
-    q-input(v-model='scope.value', dense, autofocus, counter, @keyup.enter='scope.set')
+  q-popup-edit(v-model='usernameInput', :cover='false')
+    q-input(v-model='usernameInput', dense, autofocus, counter, @keyup.enter='sendRequest()')
       template(v-slot:prepend)
         q-icon(name='alternate_email', color='grey-8', size='1.2rem')
-      template(v-slot:append)
-        div(@click='scope.set')
-          q-btn(@click='sendRequest()', round, dense, flat, icon='done', color='primary')
+      template(v-slot:append) 
+        q-btn(@click='sendRequest()', round, dense, flat, icon='done', color='primary')
 </template>
 
 <script>
@@ -65,6 +64,7 @@ export default {
     },
 
     sendRequest() {
+      console.log(this.usernameInput)
       this.showNotif()
       this.firebaseSendFriendRequest(this.usernameInput)
       this.usernameInput = ''
