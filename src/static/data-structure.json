@@ -29,7 +29,7 @@
     },
     "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": {
       "name": "Karina Hall",
-      "username": "poggers",
+      "username": "karina21",
       "email": "test2@test.com",
       "phone": null,
       "dob": null,
@@ -42,9 +42,16 @@
       "friendList": {
         "Oqk3C1ownieYIm8K0KgFqRXhKs53": true,
         "l7TY1PJocphLufQb3zN1tfRJYsy1": true
-      },
-      "pending": {
-        "oVHXZPeYRbQPfKTCmH4LWJtmaeH2": true
+      }
+    },
+    "Oqk3C1ownieYIm8K0KgFqRXhKs53": {
+      "friendList": {
+        "9HsxN1tMHNOfmQV3E16LNfcFTdc2": true
+      }
+    },
+    "l7TY1PJocphLufQb3zN1tfRJYsy1": {
+      "friendList": {
+        "9HsxN1tMHNOfmQV3E16LNfcFTdc2": true
       }
     }
   },
