@@ -17,13 +17,13 @@ q-layout(view='lHh Lpr lFf')
               | {{ menuItem.label }}
           q-separator(:key='"sep" + index', v-if='menuItem.separator')
     q-img.absolute-top(
-      src='https://i.pinimg.com/564x/a8/1e/01/a81e01701e045f8f70c71dd324c5a87a.jpg',
+      src='https://i.pinimg.com/originals/c6/77/a7/c677a7ca44173bfb724e798729494d19.jpg',
       style='height: 150px'
     )
       .row.absolute-bottom.bg-transparent.justify-center
         q-avatar(size='6.5em', style='margin-top: -95px')
           img(
-            src='https://avataaars.io/?avatarStyle=Circle&topType=Eyepatch&facialHairType=Blank&clotheType=ShirtVNeck&clotheColor=Pink&eyeType=Squint&eyebrowType=AngryNatural&mouthType=Default&skinColor=Light'
+            src='https://avataaars.io/?avatarStyle=Circle&topType=ShortHairShortFlat&accessoriesType=Round&hairColor=Blonde&facialHairType=BeardMedium&facialHairColor=Blonde&clotheType=Overall&clotheColor=Black&eyeType=Happy&eyebrowType=DefaultNatural&mouthType=Smile&skinColor=Light'
           )
         .text-bold.full-width.text-center {{ userDetails.name }}
         div {{ "@" + userDetails.username }}
