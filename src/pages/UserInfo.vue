@@ -4,7 +4,7 @@
     q-btn.bg-grey-2.fixed-top-left.q-ma-sm(@click='$router.go(-1)', icon='arrow_back', label='Back')
     q-avatar(size='9em')
       img(
-        src='https://avataaars.io/?avatarStyle=Circle&topType=Eyepatch&facialHairType=Blank&clotheType=ShirtVNeck&clotheColor=Pink&eyeType=Squint&eyebrowType=AngryNatural&mouthType=Default&skinColor=Light'
+        src='https://avataaars.io/?avatarStyle=Circle&topType=ShortHairShortFlat&accessoriesType=Round&hairColor=Blonde&facialHairType=BeardMedium&facialHairColor=Blonde&clotheType=Overall&clotheColor=Black&eyeType=Happy&eyebrowType=DefaultNatural&mouthType=Smile&skinColor=Light'
       )
   q-input.q-py-md(v-model='localDetails.name', label='Full Name', stack-label, :readonly='isEditing')
   q-input.q-pb-md(v-model='localDetails.username', label='Username', stack-label, :readonly='isEditing')
