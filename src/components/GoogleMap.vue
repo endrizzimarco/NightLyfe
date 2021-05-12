@@ -433,7 +433,7 @@ export default {
     }
   },
 
-  async created() {
+  async beforeMount() {
     // Wait for current location to be fetched and saved to store
     await this.geolocate()
     // Wait for map and map components to be loaded
