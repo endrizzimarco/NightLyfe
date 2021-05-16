@@ -17,22 +17,15 @@ export default {
     {
         icon: 'help',
         label: 'Privacy',
-        color: 'accent',
+        color: 'pink-5',
         link: '/privacy',
         separator: false
     },
     {
       icon: 'supervisor_account',
       label: 'Contact Us',
-      color: 'red-6',
+      color: 'orange-8',
       link: '/ContactUs',
-      separator: false
-    },
-    {
-      icon: 'feedback',
-      label: 'Send Feedback',
-      color: 'orange',
-      link: '/sendfeedback',
       separator: true
     },
     {
