@@ -1,8 +1,33 @@
 # NightLyfe (group23_com2027)
 
-Enhance your nightlife experience
+Enhance your nightlife experience! Check it out at https://nightlyfe-117a4.firebaseapp.com
 
-## Install the dependencies
+:warning: The project is not working anymore, as the Google Cloud API keys have been invalidated :warning:
+
+## Features
+
+### Interactive, real-time map
+
+Check out all popular nightlife destinations around you, aswell as your friends position, dangerous areas and many other useful pieces of info. Be fully aware what is happening around you to ensure a swell night out!
+
+![Map](gifs/heatmap.gif
+)
+
+### Live signals
+
+Let other users now what is happening around you, whether it be a situation to avoid or one to join in on.
+
+![Signal](gifs/signal.gif)
+
+### Throw a party!
+
+Create an event for other users to join. Turn a house party into a night to remember.
+
+![Events](gifs/events.gif)
+
+## Development
+
+### Install the dependencies
 
 ```bash
 npm install
