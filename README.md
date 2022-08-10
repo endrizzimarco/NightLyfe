@@ -10,20 +10,19 @@ Enhance your nightlife experience! Check it out at https://nightlyfe-117a4.fireb
 
 Check out all popular nightlife destinations around you, aswell as your friends position, dangerous areas and many other useful pieces of info. Be fully aware what is happening around you to ensure a swell night out!
 
-![Map](gifs/heatmap.gif
-)
+<img src="gifs/heatmap.gif" alt="map" width="300">
 
 ### Live signals
 
 Let other users now what is happening around you, whether it be a situation to avoid or one to join in on.
 
-![Signal](gifs/signal.gif)
+<img src="gifs/signal.gif" alt="signal" width="300">
 
 ### Throw a party!
 
 Create an event for other users to join. Turn a house party into a night to remember.
 
-![Events](gifs/events.gif)
+<img src="gifs/events.gif" alt="events" width="300">
 
 ## Development
 
