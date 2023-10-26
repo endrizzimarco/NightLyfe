@@ -168,8 +168,18 @@ export default {
     /*********************
         GOOGLE MAPS API
     **********************/
+    /* Add google maps global object */
+    loadGoogleMaps(apiKey) {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?libraries=places,visualization&key=${apiKey}`;
+      script.async = true;
+      script.defer = true;
+      document.body.appendChild(script);
+    },
+
     /* Initialize stylized map, nightlife places markers and crime heatmap */
     async initMap() {
+      // loadGoogleMaps()
       var heatmapData = []
       // Initialize the map instance, load the styles from the vuex store
       var map = new google.maps.Map(this.$refs['map'], {
@@ -434,6 +444,7 @@ export default {
   },
 
   async beforeMount() {
+    this.loadGoogleMaps(process.env.VUE_APP_GOOGLE_MAPS_API_KEY)
     // Wait for current location to be fetched and saved to store
     await this.geolocate()
     // Wait for map and map components to be loaded

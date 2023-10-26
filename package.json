@@ -13,9 +13,11 @@
     "@quasar/extras": "^1.0.0",
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
+    "dotenv": "^16.3.1",
     "firebase": "^8.3.1",
     "pug-plain-loader": "^1.1.0",
-    "quasar": "^2.0.0-beta.1"
+    "quasar": "^2.0.0-beta.1",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@quasar/app": "^3.0.0-beta.1",
